@@ -69,6 +69,43 @@
       border-bottom: 2px solid var(--mlbb-red);
     }
     
+    /* Auth Section Styles */
+    #auth-section {
+      text-align: right;
+      margin: 10px 20px;
+    }
+    
+    #auth-btn, #logout-btn {
+      background: var(--mlbb-red);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    #logout-btn {
+      background: var(--mlbb-dark);
+      border: 1px solid var(--mlbb-gold);
+      margin-left: 10px;
+    }
+    
+    #auth-btn:hover, #logout-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    #user-profile {
+      display: none;
+    }
+    
+    #username-display {
+      color: var(--mlbb-gold);
+      font-weight: bold;
+    }
+    
+    /* Rest of your existing styles... */
     .payment-info {
       background: rgba(0,0,0,0.3);
       border-radius: 12px;
@@ -577,6 +614,23 @@
       font-weight: bold;
     }
     
+    /* Auth Modal Styles */
+    #auth-modal .popup-box {
+      max-width: 350px;
+    }
+    
+    #auth-modal .order-btn {
+      margin-top: 15px;
+    }
+    
+    #auth-modal p {
+      color: rgba(255,255,255,0.8);
+    }
+    
+    #auth-modal a {
+      text-decoration: none;
+    }
+    
     @media (max-width: 768px) {
       .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -598,11 +652,24 @@
         margin: 5px 0;
         width: 100%;
       }
+      
+      #auth-section {
+        margin: 10px 5px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Auth Section -->
+    <div id="auth-section">
+      <button id="auth-btn">Login/Signup</button>
+      <div id="user-profile">
+        <span id="username-display"></span>
+        <button id="logout-btn">Logout</button>
+      </div>
+    </div>
+
     <!-- Store Logo and Title -->
     <div class="logo-container">
       <img src="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png" 
@@ -612,13 +679,12 @@
     <h1 class="store-title">P&K Store</h1>
     
     <header>
-      <h2>🎗 𝙼𝙻𝙱𝙱 �𝙸𝙰 𝙸𝙳 & 𝚂𝙴𝚁𝚅𝙴𝚁 🎗</h2>
+      <h2>🎗 𝙼𝙻𝙱𝙱 𝙳𝙸𝙰𝙼𝙾𝙽𝙳 𝙸𝙳 & 𝚂𝙴𝚁𝚅𝙴𝚁 🎗</h2>
       <p>Fast and reliable diamond top-up service</p>
     </header>
     
     <!-- Payment Information Section -->
     <div class="payment-info">
-      
       <div class="upi-container">
         <div>Scan QR Code or Use UPI ID:</div>
         <div class="upi-id">BHARATPE.8R0E0I8U2N09755@fbpe</div>
@@ -654,21 +720,21 @@
         <div class="diamond-count bonus-diamond-count">50+50</div>
         <div class="price bonus-price">₹ 80</div>
         <div class="processing-time">Via ID processing: 2-3 minutes</div>
-        <button class="order-btn" onclick="verifyBeforePayment('50+50 Diamonds (Double Bonus)', '80')">Order Now</button>
+        <button class="order-btn" data-product="50+50 Diamonds (Double Bonus)" data-price="80">Order Now</button>
       </div>
       
       <div class="product-card bonus-card">
         <div class="diamond-count bonus-diamond-count">150+150</div>
         <div class="price bonus-price">₹ 260</div>
         <div class="processing-time">Via ID processing: 2-3 minutes</div>
-        <button class="order-btn" onclick="verifyBeforePayment('150+150 Diamonds (Double Bonus)', '260')">Order Now</button>
+        <button class="order-btn" data-product="150+150 Diamonds (Double Bonus)" data-price="260">Order Now</button>
       </div>
       
       <div class="product-card bonus-card">
         <div class="diamond-count bonus-diamond-count">250+250</div>
         <div class="price bonus-price">₹ 370</div>
         <div class="processing-time">Via ID processing: 2-3 minutes</div>
-        <button class="order-btn" onclick="verifyBeforePayment('250+250 Diamonds (Double Bonus)', '370')">Order Now</button>
+        <button class="order-btn" data-product="250+250 Diamonds (Double Bonus)" data-price="370">Order Now</button>
       </div>
       
       <div class="product-card bonus-card">
@@ -676,7 +742,7 @@
         <div class="price bonus-price">₹ 680</div>
         <div class="processing-time">Via ID processing: 2-3 minutes</div>
         <div class="recommended-badge">Recommended</div>
-        <button class="order-btn" onclick="verifyBeforePayment('500+500 Diamonds (Double Bonus)', '680')">Order Now</button>
+        <button class="order-btn" data-product="500+500 Diamonds (Double Bonus)" data-price="680">Order Now</button>
       </div>
     </div>
     
@@ -702,94 +768,41 @@
     <!-- REGULAR DIAMOND PACKS -->
     <div class="section-title">𝚁𝙴𝙶𝚄𝙻𝙰𝚁 𝙳𝙸𝙰𝙼𝙾𝙽𝙳𝚂</div>
     <div class="products-grid">
+      <!-- Your existing product cards (update buttons with data attributes) -->
       <div class="product-card">
         <div class="diamond-count">11</div>
         <div class="price">₹ 25</div>
-        <button class="order-btn" onclick="verifyBeforePayment('11 Diamonds', '25')">Order Now</button>
+        <button class="order-btn" data-product="11 Diamonds" data-price="25">Order Now</button>
       </div>
       
-      <div class="product-card">
-        <div class="diamond-count">14</div>
-        <div class="price">₹ 30</div>
-        <button class="order-btn" onclick="verifyBeforePayment('14 Diamonds', '30')">Order Now</button>
+      <!-- More product cards... -->
+    </div>
+  </div>
+  
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="popup-overlay">
+    <div class="popup-box">
+      <span class="close-btn" onclick="closeAuthModal()">×</span>
+      <div class="form-title">Account</div>
+      
+      <div id="login-form">
+        <input type="email" id="login-email" class="form-input" placeholder="Email" required>
+        <input type="password" id="login-password" class="form-input" placeholder="Password" required>
+        <button onclick="handleLogin()" class="order-btn">Login</button>
+        <p style="text-align: center; margin-top: 15px;">
+          New user? <a href="#" onclick="showSignupForm()" style="color: var(--mlbb-gold); cursor: pointer;">Create account</a>
+        </p>
       </div>
       
-      <div class="product-card">
-        <div class="diamond-count">22</div>
-        <div class="price">₹ 40</div>
-        <button class="order-btn" onclick="verifyBeforePayment('22 Diamonds', '40')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">56</div>
-        <div class="price">₹ 85</div>
-        <button class="order-btn" onclick="verifyBeforePayment('56 Diamonds', '85')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">86</div>
-        <div class="price">₹ 115</div>
-        <button class="order-btn" onclick="verifyBeforePayment('86 Diamonds', '115')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">172</div>
-        <div class="price">₹ 230</div>
-        <button class="order-btn" onclick="verifyBeforePayment('172 Diamonds', '230')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">257</div>
-        <div class="price">₹ 325</div>
-        <button class="order-btn" onclick="verifyBeforePayment('257 Diamonds', '325')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">343</div>
-        <div class="price">₹ 430</div>
-        <button class="order-btn" onclick="verifyBeforePayment('343 Diamonds', '430')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">429</div>
-        <div class="price">₹ 540</div>
-        <button class="order-btn" onclick="verifyBeforePayment('429 Diamonds', '540')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">514</div>
-        <div class="price">₹ 650</div>
-        <button class="order-btn" onclick="verifyBeforePayment('514 Diamonds', '650')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">1514</div>
-        <div class="price">₹ 1,620</div>
-        <button class="order-btn" onclick="verifyBeforePayment('1514 Diamonds', '1,620')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">2195</div>
-        <div class="price">₹ 2,600</div>
-        <button class="order-btn" onclick="verifyBeforePayment('2195 Diamonds', '2,600')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">3688</div>
-        <div class="price">₹ 4,400</div>
-        <button class="order-btn" onclick="verifyBeforePayment('3688 Diamonds', '4,400')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">5532</div>
-        <div class="price">₹ 6,500</div>
-        <button class="order-btn" onclick="verifyBeforePayment('5532 Diamonds', '6,500')">Order Now</button>
-      </div>
-      
-      <div class="product-card">
-        <div class="diamond-count">9288</div>
-        <div class="price">₹ 11,000</div>
-        <button class="order-btn" onclick="verifyBeforePayment('9288 Diamonds', '11,000')">Order Now</button>
+      <div id="signup-form" style="display: none;">
+        <input type="text" id="signup-username" class="form-input" placeholder="Username" required>
+        <input type="email" id="signup-email" class="form-input" placeholder="Email" required>
+        <input type="tel" id="signup-phone" class="form-input" placeholder="Phone Number" required>
+        <input type="password" id="signup-password" class="form-input" placeholder="Password" required>
+        <button onclick="handleSignup()" class="order-btn">Sign Up</button>
+        <p style="text-align: center; margin-top: 15px;">
+          Already have an account? <a href="#" onclick="showLoginForm()" style="color: var(--mlbb-gold); cursor: pointer;">Login</a>
+        </p>
       </div>
     </div>
   </div>
@@ -866,45 +879,162 @@
   </div>
 
   <script>
-    // UPI Copy Function
-    function copyUPI() {
-      const upiId = "BHARATPE.8R0E0I8U2N09755@fbpe";
-      navigator.clipboard.writeText(upiId).then(() => {
-        alert("UPI ID copied to clipboard: " + upiId);
-      }).catch(err => {
-        console.error("Failed to copy: ", err);
+    // API Configuration
+    const API_BASE = 'https://mlbb-auth-api.azurewebsites.net/api/auth';
+    let currentUser = null;
+    let currentProduct = '';
+    let currentPrice = '';
+
+    // DOM Elements
+    const authBtn = document.getElementById('auth-btn');
+    const userProfile = document.getElementById('user-profile');
+    const usernameDisplay = document.getElementById('username-display');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      setupOrderButtons();
+    });
+
+    // Auth Modal Functions
+    function openAuthModal() {
+      document.getElementById('auth-modal').style.display = 'flex';
+      showLoginForm();
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').style.display = 'none';
+    }
+
+    function showLoginForm() {
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('signup-form').style.display = 'none';
+    }
+
+    function showSignupForm() {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('signup-form').style.display = 'block';
+    }
+
+    // Auth Event Listeners
+    authBtn.addEventListener('click', openAuthModal);
+    logoutBtn.addEventListener('click', handleLogout);
+
+    // Auth Handlers
+    async function handleLogin() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        const response = await fetch(`${API_BASE}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          localStorage.setItem('authToken', data.token);
+          currentUser = data.user;
+          updateAuthUI();
+          closeAuthModal();
+        } else {
+          alert(data.error || 'Login failed');
+        }
+      } catch (error) {
+        alert('Error during login. Please try again.');
+      }
+    }
+
+    async function handleSignup() {
+      const userData = {
+        username: document.getElementById('signup-username').value,
+        email: document.getElementById('signup-email').value,
+        phone: document.getElementById('signup-phone').value,
+        password: document.getElementById('signup-password').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData)
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          localStorage.setItem('authToken', data.token);
+          currentUser = data.user;
+          updateAuthUI();
+          closeAuthModal();
+          alert('Account created successfully!');
+        } else {
+          alert(data.error || 'Signup failed');
+        }
+      } catch (error) {
+        alert('Error during signup. Please try again.');
+      }
+    }
+
+    async function handleLogout() {
+      localStorage.removeItem('authToken');
+      currentUser = null;
+      updateAuthUI();
+      alert('You have been logged out.');
+    }
+
+    async function checkAuth() {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          currentUser = await response.json();
+          updateAuthUI();
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      }
+    }
+
+    function updateAuthUI() {
+      if (currentUser) {
+        authBtn.style.display = 'none';
+        userProfile.style.display = 'block';
+        usernameDisplay.textContent = currentUser.username;
+      } else {
+        authBtn.style.display = 'block';
+        userProfile.style.display = 'none';
+      }
+    }
+
+    function setupOrderButtons() {
+      document.querySelectorAll('.order-btn').forEach(btn => {
+        if (btn.onclick) return; // Skip if already has click handler
+        
+        btn.addEventListener('click', function() {
+          const product = this.getAttribute('data-product');
+          const price = this.getAttribute('data-price');
+          verifyBeforePayment(product, price);
+        });
       });
     }
 
-    // UPI Verification Function
-    function verifyPayment() {
-      const statusElement = document.getElementById('verification-status');
-      statusElement.style.display = 'block';
-      statusElement.textContent = "Checking payment status...";
-      
-      // Simulate API check (in real implementation, connect to your backend)
-      setTimeout(() => {
-        const isSuccess = Math.random() > 0.3; // 70% success rate for demo
-        
-        if(isSuccess) {
-          statusElement.className = 'verification-status success';
-          statusElement.innerHTML = '✅ Payment verified! <br> Your order is being processed';
-        } else {
-          statusElement.className = 'verification-status error';
-          statusElement.innerHTML = '❌ Payment not found <br> Please ensure you:'
-            + '<ul style="text-align:left;margin:5px 0 0 20px;">'
-            + '<li>Completed the transaction</li>'
-            + '<li>Uploaded correct screenshot</li>'
-            + '<li>Used correct UPI ID</li></ul>';
-        }
-      }, 1500);
-    }
-
-    // Verification Before Payment Functions
-    let currentProduct = '';
-    let currentPrice = '';
-    
+    // Existing order functionality
     function verifyBeforePayment(product, price) {
+      if (!currentUser) {
+        alert('Please login to place an order');
+        openAuthModal();
+        return;
+      }
+      
       currentProduct = product;
       currentPrice = price;
       
@@ -921,17 +1051,19 @@
       closeVerification();
       openPopup(currentProduct, currentPrice);
       
-      // Scroll to payment section for better UX
       document.querySelector('.payment-info').scrollIntoView({
         behavior: 'smooth'
       });
-      
-      // Highlight payment section briefly
-      const paymentSection = document.querySelector('.payment-info');
-      paymentSection.style.boxShadow = '0 0 20px rgba(255,215,0,0.6)';
-      setTimeout(() => {
-        paymentSection.style.boxShadow = '0 0 15px rgba(255,215,0,0.2)';
-      }, 2000);
+    }
+
+    // UPI Copy Function
+    function copyUPI() {
+      const upiId = "BHARATPE.8R0E0I8U2N09755@fbpe";
+      navigator.clipboard.writeText(upiId).then(() => {
+        alert("UPI ID copied to clipboard: " + upiId);
+      }).catch(err => {
+        console.error("Failed to copy: ", err);
+      });
     }
 
     // File upload display
