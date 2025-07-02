@@ -103,6 +103,8 @@
     #username-display {
       color: var(--mlbb-gold);
       font-weight: bold;
+      cursor: pointer;
+      text-decoration: underline;
     }
     
     /* Rest of your existing styles... */
@@ -768,14 +770,65 @@
     <!-- REGULAR DIAMOND PACKS -->
     <div class="section-title">𝚁𝙴𝙶𝚄𝙻𝙰𝚁 𝙳𝙸𝙰𝙼𝙾𝙽𝙳𝚂</div>
     <div class="products-grid">
-      <!-- Your existing product cards (update buttons with data attributes) -->
       <div class="product-card">
         <div class="diamond-count">11</div>
         <div class="price">₹ 25</div>
         <button class="order-btn" data-product="11 Diamonds" data-price="25">Order Now</button>
       </div>
       
-      <!-- More product cards... -->
+      <div class="product-card">
+        <div class="diamond-count">86</div>
+        <div class="price">₹ 115</div>
+        <button class="order-btn" data-product="86 Diamonds" data-price="115">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">172</div>
+        <div class="price">₹ 230</div>
+        <button class="order-btn" data-product="172 Diamonds" data-price="230">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">257</div>
+        <div class="price">₹ 340</div>
+        <button class="order-btn" data-product="257 Diamonds" data-price="340">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">344</div>
+        <div class="price">₹ 460</div>
+        <button class="order-btn" data-product="344 Diamonds" data-price="460">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">429</div>
+        <div class="price">₹ 570</div>
+        <button class="order-btn" data-product="429 Diamonds" data-price="570">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">514</div>
+        <div class="price">₹ 680</div>
+        <button class="order-btn" data-product="514 Diamonds" data-price="680">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">706</div>
+        <div class="price">₹ 940</div>
+        <button class="order-btn" data-product="706 Diamonds" data-price="940">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">1412</div>
+        <div class="price">₹ 1880</div>
+        <button class="order-btn" data-product="1412 Diamonds" data-price="1880">Order Now</button>
+      </div>
+      
+      <div class="product-card">
+        <div class="diamond-count">2195</div>
+        <div class="price">₹ 2900</div>
+        <button class="order-btn" data-product="2195 Diamonds" data-price="2900">Order Now</button>
+      </div>
     </div>
   </div>
   
@@ -875,6 +928,50 @@
           Send via WhatsApp
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- Profile Management Modal -->
+  <div id="profile-modal" class="popup-overlay" style="display: none;">
+    <div class="popup-box">
+      <span class="close-btn" onclick="closeProfileModal()">×</span>
+      <div class="form-title">Manage Profile</div>
+      
+      <form id="profile-form">
+        <input type="email" id="profile-email" class="form-input" placeholder="New Email" required>
+        <button type="submit" class="order-btn">Update Profile</button>
+      </form>
+      
+      <button onclick="showPasswordResetModal()" class="order-btn" style="margin-top: 15px; background: var(--mlbb-red);">
+        Change Password
+      </button>
+    </div>
+  </div>
+
+  <!-- Password Reset Request Modal -->
+  <div id="reset-request-modal" class="popup-overlay" style="display: none;">
+    <div class="popup-box">
+      <span class="close-btn" onclick="closeResetRequestModal()">×</span>
+      <div class="form-title">Reset Password</div>
+      
+      <input type="email" id="reset-email" class="form-input" placeholder="Your Email" required>
+      <button onclick="requestPasswordReset()" class="order-btn">Send Reset Link</button>
+      <p style="text-align: center; margin-top: 15px;">
+        Remember your password? <a href="#" onclick="showLoginForm()" style="color: var(--mlbb-gold);">Login</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Password Reset Completion Modal -->
+  <div id="reset-complete-modal" class="popup-overlay" style="display: none;">
+    <div class="popup-box">
+      <span class="close-btn" onclick="closeResetCompleteModal()">×</span>
+      <div class="form-title">Set New Password</div>
+      
+      <input type="hidden" id="reset-token">
+      <input type="password" id="new-password" class="form-input" placeholder="New Password" required>
+      <input type="password" id="confirm-password" class="form-input" placeholder="Confirm Password" required>
+      <button onclick="completePasswordReset()" class="order-btn">Update Password</button>
     </div>
   </div>
 
@@ -1009,6 +1106,7 @@
         authBtn.style.display = 'none';
         userProfile.style.display = 'block';
         usernameDisplay.textContent = currentUser.username;
+        usernameDisplay.onclick = openProfileModal;
       } else {
         authBtn.style.display = 'block';
         userProfile.style.display = 'none';
@@ -1026,6 +1124,118 @@
         });
       });
     }
+
+    // Profile Management Functions
+    function openProfileModal() {
+      if (!currentUser) {
+        alert('Please login to manage your profile');
+        openAuthModal();
+        return;
+      }
+      
+      document.getElementById('profile-email').value = currentUser.email || '';
+      document.getElementById('profile-modal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').style.display = 'none';
+    }
+
+    function showPasswordResetModal() {
+      closeProfileModal();
+      document.getElementById('reset-email').value = currentUser.email || '';
+      document.getElementById('reset-request-modal').style.display = 'flex';
+    }
+
+    function closeResetRequestModal() {
+      document.getElementById('reset-request-modal').style.display = 'none';
+    }
+
+    function closeResetCompleteModal() {
+      document.getElementById('reset-complete-modal').style.display = 'none';
+    }
+
+    async function requestPasswordReset() {
+      const email = document.getElementById('reset-email').value;
+      
+      try {
+        const response = await fetch(`${API_BASE}/request-password-reset`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        if (response.ok) {
+          alert('Password reset link sent to your email');
+          closeResetRequestModal();
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Failed to send reset link');
+        }
+      } catch (error) {
+        alert('Error requesting password reset');
+      }
+    }
+
+    async function completePasswordReset() {
+      const token = document.getElementById('reset-token').value;
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      
+      if (newPassword !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, newPassword })
+        });
+        
+        if (response.ok) {
+          alert('Password updated successfully!');
+          closeResetCompleteModal();
+          showLoginForm();
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Failed to reset password');
+        }
+      } catch (error) {
+        alert('Error resetting password');
+      }
+    }
+
+    // Handle profile form submission
+    document.getElementById('profile-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const newEmail = document.getElementById('profile-email').value;
+      
+      try {
+        const response = await fetch(`${API_BASE}/update-email`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({ newEmail })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          currentUser.email = newEmail;
+          alert('Email updated successfully!');
+          closeProfileModal();
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Failed to update email');
+        }
+      } catch (error) {
+        alert('Error updating email');
+      }
+    });
 
     // Existing order functionality
     function verifyBeforePayment(product, price) {
