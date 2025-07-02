@@ -227,7 +227,7 @@
       box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
     }
     
-    .starlight-card {
+    .Weekly-card {
       border: 1px solid var(--mlbb-gold);
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
     }
@@ -245,7 +245,7 @@
       text-transform: uppercase;
     }
     
-    .starlight-badge {
+    .Weekly-badge {
       position: absolute;
       top: 10px;
       right: 10px;
@@ -276,7 +276,7 @@
       color: var(--bonus-green);
     }
     
-    .starlight-count {
+    .Weekly-count {
       color: var(--mlbb-gold);
     }
     
@@ -286,7 +286,7 @@
       font-size: 24px;
     }
     
-    .starlight-count:before {
+    .Weekly-count:before {
       content: "✨";
       margin-right: 8px;
       font-size: 24px;
@@ -678,22 +678,22 @@
       </div>
     </div>
     
-    <!-- STARLIGHT PASS -->
+    <!-- WEEKLY PASS -->
     <div class="section-title">𝚂𝚃𝙰𝚁𝙻𝙸𝙶𝙷𝚃 𝙿𝙰𝚂𝚂</div>
     <div class="products-grid">
-      <div class="product-card starlight-card">
-        <div class="starlight-badge">VIP</div>
-        <div class="diamond-count starlight-count">Starlight Pass</div>
+      <div class="product-card Weekly-card">
+        <div class="Weekly-badge">VIP</div>
+        <div class="diamond-count Weekly-count">Weekly Pass</div>
         <div class="price">₹ 130 <span style="font-size:14px">each</span></div>
         
         <div class="quantity-controls">
-          <button class="quantity-btn" onclick="adjustQuantity('starlight', -1)">-</button>
-          <input type="number" id="starlight-qty" class="quantity-input" value="1" min="1" max="10">
-          <button class="quantity-btn" onclick="adjustQuantity('starlight', 1)">+</button>
+          <button class="quantity-btn" onclick="adjustQuantity('Weekly', -1)">-</button>
+          <input type="number" id="Weekly-qty" class="quantity-input" value="1" min="1" max="10">
+          <button class="quantity-btn" onclick="adjustQuantity('Weekly', 1)">+</button>
         </div>
         <div class="max-notice">(Max 10 per order)</div>
         
-        <button class="order-btn" onclick="orderStarlight()">Order Now</button>
+        <button class="order-btn" onclick="orderWeekly()">Order Now</button>
       </div>
     </div>
     
@@ -938,7 +938,7 @@
       document.getElementById('file-name').textContent = fileName;
     });
 
-    // Quantity Control for Starlight Pass
+    // Quantity Control for Weekly Pass
     function adjustQuantity(type, change) {
       const input = document.getElementById(`${type}-qty`);
       let newVal = parseInt(input.value) + change;
@@ -946,11 +946,11 @@
       input.value = newVal;
     }
     
-    function orderStarlight() {
-      const quantity = parseInt(document.getElementById("starlight-qty").value);
+    function orderWeekly() {
+      const quantity = parseInt(document.getElementById("Weekly-qty").value);
       const totalPrice = 130 * quantity;
       verifyBeforePayment(
-        `${quantity} Starlight Pass${quantity > 1 ? 'es' : ''}`, 
+        `${quantity} Weekly Pass${quantity > 1 ? 'es' : ''}`, 
         totalPrice
       );
     }
