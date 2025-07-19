@@ -1,0 +1,18 @@
+{
+  "name": "mobile-legends-recharge-platform",
+  "version": "1.0.0",
+  "description": "Complete Mobile Legends Diamond Recharge Platform with React Frontend and Node.js Backend",
+  "scripts": {
+    "dev": "concurrently \"npm run --prefix server dev\" \"npm run --prefix client dev\"",
+    "build": "npm run --prefix client build && npm run --prefix server build",
+    "start": "node server/dist/app.js",
+    "install:all": "npm install && npm install --prefix client && npm install --prefix server",
+    "deploy": "npm run build && npm run start"
+  },
+  "keywords": ["mobile-legends", "gaming", "recharge", "react", "nodejs"],
+  "author": "P&K Store",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

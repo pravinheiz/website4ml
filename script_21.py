@@ -1,4 +1,118 @@
-# Mobile Legends Diamond Recharge Platform
+# Generate deployment files
+
+# Generate Docker files
+dockerfile = """# Multi-stage build for production
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY server/package.json ./server/
+COPY client/package.json ./client/
+RUN npm ci
+
+# Build the client
+FROM base AS client-builder
+WORKDIR /app
+COPY client ./client
+COPY --from=deps /app/client/node_modules ./client/node_modules
+WORKDIR /app/client
+RUN npm run build
+
+# Build the server
+FROM base AS server-builder
+WORKDIR /app
+COPY server ./server
+COPY --from=deps /app/server/node_modules ./server/node_modules
+WORKDIR /app/server
+RUN npm run build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy built application
+COPY --from=client-builder /app/client/dist ./client/dist
+COPY --from=server-builder /app/server/dist ./server/dist
+COPY --from=server-builder /app/server/node_modules ./server/node_modules
+COPY server/package.json ./server/
+
+USER nextjs
+
+EXPOSE 4000
+
+ENV PORT 4000
+
+CMD ["node", "server/dist/app.js"]"""
+
+# Generate docker-compose for development
+docker_compose_yml = """version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  # Optional: Local SQL Server for development
+  # sqlserver:
+  #   image: mcr.microsoft.com/mssql/server:2019-latest
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #     - SA_PASSWORD=YourStrong@Password
+  #   ports:
+  #     - "1433:1433"
+  #   volumes:
+  #     - sqlserver_data:/var/opt/mssql
+
+volumes:
+  sqlserver_data:"""
+
+# Generate Vercel configuration
+vercel_json = """{
+  "version": 2,
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "server/src/app.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server/src/app.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/dist/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}"""
+
+# Generate README
+readme_md = """# Mobile Legends Diamond Recharge Platform
 
 A full-stack web application for Mobile Legends diamond recharge with React frontend, Node.js backend, Azure SQL database, and Google OAuth authentication.
 
@@ -207,3 +321,19 @@ This project is licensed under the MIT License.
 ---
 
 Built with ❤️ for Mobile Legends players by P&K Store
+"""
+
+# Write deployment files
+with open(f"{base_dir}/Dockerfile", "w") as f:
+    f.write(dockerfile)
+
+with open(f"{base_dir}/docker-compose.yml", "w") as f:
+    f.write(docker_compose_yml)
+
+with open(f"{base_dir}/vercel.json", "w") as f:
+    f.write(vercel_json)
+
+with open(f"{base_dir}/README.md", "w") as f:
+    f.write(readme_md)
+
+print("Deployment files and documentation created!")

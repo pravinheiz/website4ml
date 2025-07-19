@@ -1,0 +1,66 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-backgroundDark text-white font-sans;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', monospace;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent hover:bg-accent/80 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-glow hover:shadow-glowStrong;
+  }
+
+  .btn-secondary {
+    @apply bg-accent2 hover:bg-accent2/80 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-glowPink;
+  }
+
+  .input {
+    @apply bg-primary/50 border border-accent/30 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none transition-all;
+  }
+
+  .card {
+    @apply bg-secondary/60 backdrop-blur-sm rounded-xl p-6 border border-accent/20 hover:border-accent/40 hover:shadow-glow transition-all duration-300;
+  }
+
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00a1ff;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0080cc;
+}
+
+/* Gaming particles background */
+.particles-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
