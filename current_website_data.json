@@ -1,0 +1,88 @@
+{
+  "payment_info": {
+    "upi_id": "BHARATPE.8R0E0I8U2N09755@fbpe",
+    "whatsapp_number": "9362584929"
+  },
+  "images": {
+    "logo": "https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png",
+    "qr_code": "https://i.ibb.co/Ng8QNzV9/Whats-App-Image-2025-07-02-at-09-13-44-998097fb.jpg",
+    "verification_sample": "https://i.ibb.co/vvhQ3PP3/Whats-App-Image-2025-07-02-at-09-17-02-4e90a5e6.jpg"
+  },
+  "diamond_packages": [
+    {
+      "type": "double_bonus",
+      "diamonds": "50+50",
+      "price": 80
+    },
+    {
+      "type": "double_bonus",
+      "diamonds": "150+150",
+      "price": 260
+    },
+    {
+      "type": "double_bonus",
+      "diamonds": "250+250",
+      "price": 370
+    },
+    {
+      "type": "double_bonus",
+      "diamonds": "500+500",
+      "price": 680
+    },
+    {
+      "type": "regular",
+      "diamonds": "11",
+      "price": 25
+    },
+    {
+      "type": "regular",
+      "diamonds": "86",
+      "price": 115
+    },
+    {
+      "type": "regular",
+      "diamonds": "172",
+      "price": 230
+    },
+    {
+      "type": "regular",
+      "diamonds": "257",
+      "price": 340
+    },
+    {
+      "type": "regular",
+      "diamonds": "344",
+      "price": 460
+    },
+    {
+      "type": "regular",
+      "diamonds": "429",
+      "price": 570
+    },
+    {
+      "type": "regular",
+      "diamonds": "514",
+      "price": 680
+    },
+    {
+      "type": "regular",
+      "diamonds": "706",
+      "price": 940
+    },
+    {
+      "type": "regular",
+      "diamonds": "1412",
+      "price": 1880
+    },
+    {
+      "type": "regular",
+      "diamonds": "2195",
+      "price": 2900
+    },
+    {
+      "type": "weekly_pass",
+      "diamonds": "Weekly Pass",
+      "price": 130
+    }
+  ]
+}
