@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P&K Store – MLBB Diamond Top-Up</title>
+  <link rel="icon" type="image/png" href="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <header class="app-header container flex items-center justify-between py-16">
+    <div class="flex items-center gap-16">
+      <img src="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png" alt="P&K Store Logo" class="logo-img">
+      <h1 class="app-title">P&K Store</h1>
+    </div>
+    <div class="sync-wrapper flex items-center gap-8">
+      <span id="sync-status" class="status status--info">Local Only</span>
+      <button id="connect-drive-btn" class="btn btn--outline btn--sm">Connect Drive</button>
+    </div>
+  </header>
+
+  <!-- ========================== AUTH ========================== -->
+  <main id="auth-section" class="container auth-section py-16">
+    <div class="card" style="max-width:380px;margin:0 auto;">
+      <div class="card__body">
+        <h2 class="text-center mb-16">Login</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input id="username" class="form-control" type="text" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input id="password" class="form-control" type="password" required>
+          </div>
+          <button class="btn btn--primary btn--full-width" type="submit">Login</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================== STORE ========================== -->
+  <main id="store-section" class="hidden">
+    <div class="container py-16 flex flex-col gap-24">
+      <!-- USER BAR -->
+      <div class="user-bar flex items-center justify-between">
+        <div class="flex items-center gap-8">
+          <strong id="current-user">User</strong>
+          <span id="user-role" class="badge"></span>
+        </div>
+        <div class="flex items-center gap-8">
+          <button id="nav-my-orders-btn" class="btn btn--secondary btn--sm">My Orders</button>
+          <button id="admin-panel-btn" class="btn btn--secondary btn--sm hidden">Admin Panel</button>
+          <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
+        </div>
+      </div>
+
+      <!-- PACKAGES LIST -->
+      <section id="packages-section">
+        <h2 class="mb-16 text-center">Diamond Packages</h2>
+        <!-- Small -->
+        <h3 class="mb-8">Small Packs</h3>
+        <div id="small-packs" class="packages-grid mb-16"></div>
+        <!-- Medium -->
+        <h3 class="mb-8">Medium Packs</h3>
+        <div id="medium-packs" class="packages-grid mb-16"></div>
+        <!-- Large -->
+        <h3 class="mb-8">Larger Packs</h3>
+        <div id="larger-packs" class="packages-grid"></div>
+      </section>
+
+      <!-- MY ORDERS -->
+      <section id="my-orders-section" class="hidden">
+        <h2 class="mb-16 text-center">My Orders</h2>
+        <div class="table-wrapper">
+          <table class="orders-table" id="my-orders-table">
+            <thead>
+              <tr>
+                <th>Order&nbsp;ID</th>
+                <th>Product</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ========================== ADMIN PANEL ========================== -->
+  <section id="admin-panel" class="admin-panel hidden">
+    <div class="container py-16 flex flex-col gap-24">
+      <div class="flex items-center justify-between">
+        <h2>Admin Panel</h2>
+        <button id="close-admin-btn" class="btn btn--outline btn--sm">Close</button>
+      </div>
+
+      <!-- ORDERS MANAGEMENT -->
+      <div class="card">
+        <div class="card__header flex justify-between items-center">
+          <h3>Orders Management</h3>
+          <div class="flex gap-8">
+            <input id="order-search" class="form-control" placeholder="Search orders…">
+            <button id="export-csv-btn" class="btn btn--secondary btn--sm">Export CSV</button>
+          </div>
+        </div>
+        <div class="card__body">
+          <div class="table-wrapper">
+            <table class="orders-table" id="admin-orders-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User</th>
+                  <th>Product</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Notes</th>
+                  <th>Updated</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== ORDER MODAL ========================== -->
+  <div id="order-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header flex justify-between items-center">
+        <h3>Complete Your Order</h3>
+        <button id="close-order-btn" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="order-summary mb-16 flex justify-between">
+          <span id="order-package">Package</span>
+          <strong id="order-price">₹0</strong>
+        </div>
+
+        <!-- QR CODE + UPI -->
+        <div class="qr-wrapper flex flex-col items-center gap-8 mb-16">
+          <img src="https://i.ibb.co/Ng8QNzV9/Whats-App-Image-2025-07-02-at-09-13-44-998097fb.jpg" alt="QR Code" class="qr-img">
+          <div class="flex items-center gap-8">
+            <code id="upi-text">BHARATPE.8R0E0I8U2N09755@fbpe</code>
+            <button class="btn btn--outline btn--sm" id="copy-upi-btn">Copy</button>
+          </div>
+        </div>
+
+        <!-- ORDER FORM -->
+        <form id="order-form">
+          <div class="form-group">
+            <label class="form-label" for="mlbb-id">MLBB ID</label>
+            <input id="mlbb-id" class="form-control" type="number" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="server-id">Server ID</label>
+            <input id="server-id" class="form-control" type="number" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ign">In-Game Name</label>
+            <input id="ign" class="form-control" type="text" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="payment-ss">Payment Screenshot</label>
+            <input id="payment-ss" class="form-control" type="file" accept="image/*" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Send Order via WhatsApp</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================== NOTIFICATION ========================== -->
+  <div id="notification" class="notification hidden"><span id="notification-text"></span></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
