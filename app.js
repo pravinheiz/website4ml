@@ -7,9 +7,8 @@ let sessionTimeout = null;
 // Authorized Users List (stored in localStorage)
 const DEFAULT_USERS = [
   { username: "admin", password: "admin123", role: "admin", protected: true },
-  { username: "customer1", password: "pass123", role: "customer", protected: false },
-  { username: "customer2", password: "pass456", role: "customer", protected: false },
   { username: "Srini", password: "Srini@12345", role: "customer", protected: false },
+  { username: "customer2", password: "pass456", role: "customer", protected: false },
   { username: "vip_user", password: "vip789", role: "vip", protected: false }
 ];
 
