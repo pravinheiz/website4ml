@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P&K Store - MLBB Diamond Store</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://apis.google.com/js/api.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/HVBjSgL/logo.png" alt="P&K Store" class="logo">
+        <div class="store-info">
+          <h1>P&K Store</h1>
+          <p class="tagline">Your trusted MLBB diamond store</p>
+        </div>
+      </div>
+      <div class="sync-status-bar">
+        <div class="sync-indicator">
+          <span id="sync-status" class="sync-status sync-disconnected">⚫ Local Only</span>
+          <button id="connect-drive-btn" class="btn btn--outline btn--sm">Connect Drive</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Login Section -->
+    <section id="login-section" class="login-section">
+      <div class="login-card">
+        <h2>🎮 Login to P&K Store</h2>
+        <form id="login-form" class="login-form">
+          <div class="form-group">
+            <input type="text" id="username" class="form-control" placeholder="Username" required>
+          </div>
+          <div class="form-group">
+            <input type="password" id="password" class="form-control" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+        </form>
+        <p class="login-footer">
+          No account? <a href="#" id="show-register">Register here</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Registration Modal -->
+    <div id="register-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Account</h3>
+          <button id="close-register" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="register-form">
+            <div class="form-group">
+              <input type="text" id="reg-username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+              <input type="password" id="reg-password" class="form-control" placeholder="Password" required>
+            </div>
+            <div class="form-group">
+              <input type="password" id="reg-confirm" class="form-control" placeholder="Confirm Password" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Store Content -->
+    <main id="store-content" class="store-content hidden">
+      <!-- User Bar -->
+      <div class="user-bar">
+        <div class="user-info">
+          <span class="user-welcome">Welcome, <strong id="current-user"></strong>!</span>
+          <span class="user-role" id="user-role">CUSTOMER</span>
+        </div>
+        <div class="user-actions">
+          <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
+          <button id="admin-panel-btn" class="btn btn--primary btn--sm hidden">Admin Panel</button>
+        </div>
+      </div>
+
+      <!-- Payment Information -->
+      <section class="payment-section">
+        <h2 class="section-title">💳 Payment Information</h2>
+        <div class="payment-info-card">
+          <div class="payment-qr">
+            <img src="https://i.ibb.co/HVBjSgL/qr-code.png" alt="Payment QR Code" class="qr-code">
+          </div>
+          <div class="payment-method">
+            <h3>🏦 UPI Payment</h3>
+            <div class="upi-info">
+              <span class="upi-id" id="upi-id">BHARATPE.8R0E0I8U2N09755@fbpe</span>
+              <button class="btn btn--outline btn--sm" onclick="copyUpiId()">Copy UPI ID</button>
+            </div>
+          </div>
+          <div class="payment-method">
+            <h3>💬 WhatsApp Support</h3>
+            <div class="whatsapp-info">
+              <span class="whatsapp-number">+91 9362584929</span>
+              <a href="https://wa.me/919362584929" target="_blank" class="btn btn--outline btn--sm" style="background: var(--whatsapp-green); color: white; border-color: var(--whatsapp-green);">
+                Chat on WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Diamond Packages -->
+      <section class="packages-section">
+        <h2 class="section-title">💎 Diamond Packages</h2>
+        
+        <!-- Small Packs -->
+        <div class="package-category">
+          <h3 class="category-title">🔥 Small Packs</h3>
+          <div id="small-packs" class="packages-grid">
+            <!-- Small packages will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Medium Packs -->
+        <div class="package-category">
+          <h3 class="category-title">⚡ Medium Packs</h3>
+          <div id="medium-packs" class="packages-grid">
+            <!-- Medium packages will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Larger Packs -->
+        <div class="package-category">
+          <h3 class="category-title">🚀 Larger Packs</h3>
+          <div id="larger-packs" class="packages-grid">
+            <!-- Larger packages will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Weekly Pass -->
+        <div class="package-category">
+          <h3 class="category-title">📅 Weekly Pass</h3>
+          <div class="packages-grid">
+            <div class="package-card special">
+              <div class="package-header">
+                <div class="diamond-count">Weekly Pass</div>
+                <div class="package-price">₹ 130</div>
+              </div>
+              <div class="package-bonus">
+                <span class="bonus-text">Daily rewards for 7 days</span>
+              </div>
+              <div class="quantity-controls">
+                <label for="weekly-quantity">Quantity:</label>
+                <select id="weekly-quantity" class="form-control">
+                  <option value="1">1 Week</option>
+                  <option value="2">2 Weeks</option>
+                  <option value="4">1 Month</option>
+                </select>
+              </div>
+              <button class="package-btn" type="button" onclick="showWeeklyPassOrder()">Buy Weekly Pass</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Enhanced Admin Panel with Sync Controls -->
+    <div id="admin-panel" class="admin-panel hidden">
+      <div class="admin-header">
+        <h2>🛠️ Admin Panel</h2>
+        <button id="close-admin" class="btn btn--outline btn--sm">Close</button>
+      </div>
+
+      <!-- Sync Controls Section -->
+      <div class="sync-controls-section">
+        <h3>☁️ Google Drive Sync</h3>
+        <div class="sync-controls">
+          <div class="sync-actions">
+            <button id="sync-to-drive" class="btn btn--primary btn--sm">Sync to Drive</button>
+            <button id="load-from-drive" class="btn btn--secondary btn--sm">Load from Drive</button>
+            <button id="force-sync" class="btn btn--outline btn--sm">Force Sync</button>
+          </div>
+          <div class="sync-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" id="admin-sync-progress"></div>
+            </div>
+            <span class="progress-text" id="admin-sync-text">Ready</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Management Section -->
+      <div class="user-management-section">
+        <h3>👥 User Management</h3>
+        <div class="add-user-form">
+          <input type="text" id="admin-username" class="form-control" placeholder="Username">
+          <input type="password" id="admin-password" class="form-control" placeholder="Password">
+          <select id="admin-role" class="form-control">
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="customer">Customer</option>
+            <option value="vip">VIP</option>
+          </select>
+          <button id="add-user-btn" class="btn btn--primary">Add User</button>
+        </div>
+        <div class="users-list" id="admin-users-list">
+          <!-- Users will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>💎 Order Details</h3>
+          <button id="close-order" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="order-summary">
+            <div class="order-item">
+              <span class="item-name" id="order-item-name">Package Name</span>
+              <span class="item-price" id="order-item-price">₹ 0</span>
+            </div>
+          </div>
+
+          <div class="payment-instructions">
+            <h4>📋 Payment Instructions:</h4>
+            <ol>
+              <li>Copy the UPI ID or scan the QR code</li>
+              <li>Make payment through any UPI app</li>
+              <li>Take a screenshot of payment confirmation</li>
+              <li>Send the screenshot along with your server ID via WhatsApp</li>
+            </ol>
+          </div>
+
+          <form id="order-form">
+            <div class="form-group">
+              <label for="server-id" class="form-label">Server ID (Numbers only):</label>
+              <input type="text" id="server-id" class="form-control" placeholder="Enter your server ID" required>
+              <div class="form-help">Enter your MLBB server ID (numbers only)</div>
+            </div>
+            
+            <div class="order-actions">
+              <button type="submit" class="btn btn--primary btn--full-width">Send Order via WhatsApp</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+      <span id="notification-text"></span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
