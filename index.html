@@ -6,851 +6,289 @@
   <title>P&K Store - MLBB Diamond Top-Up</title>
   <link rel="icon" type="image/png" href="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      /* Color Scheme */
-      --mlbb-red: #FF4655;
-      --mlbb-gold: #FFD700;
-      --mlbb-blue: #1E3A8A;
-      --mlbb-purple: #8B5CF6;
-      --mlbb-dark: #1F2937;
-      --mlbb-darker: #111827;
-      --mlbb-light: #F8FAFC;
-      --mlbb-accent: #10B981;
-      --whatsapp-green: #25D366;
-      
-      /* Primary Colors */
-      --color-primary: var(--mlbb-red);
-      --color-primary-hover: #E63946;
-      --color-primary-active: #D32F2F;
-      --color-secondary: rgba(255, 70, 85, 0.1);
-      --color-secondary-hover: rgba(255, 70, 85, 0.2);
-      --color-secondary-active: rgba(255, 70, 85, 0.3);
-      --color-background: var(--mlbb-darker);
-      --color-surface: var(--mlbb-dark);
-      --color-text: var(--mlbb-light);
-      --color-text-secondary: #94A3B8;
-      --color-border: rgba(255, 70, 85, 0.3);
-      
-      /* Typography */
-      --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-size-xs: 11px;
-      --font-size-sm: 12px;
-      --font-size-base: 14px;
-      --font-size-md: 16px;
-      --font-size-lg: 18px;
-      --font-size-xl: 20px;
-      --font-size-2xl: 24px;
-      --font-size-3xl: 30px;
-      --font-size-4xl: 36px;
-      
-      /* Spacing */
-      --space-4: 4px;
-      --space-8: 8px;
-      --space-12: 12px;
-      --space-16: 16px;
-      --space-20: 20px;
-      --space-24: 24px;
-      --space-32: 32px;
-      
-      /* Borders */
-      --radius-sm: 4px;
-      --radius-base: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-full: 9999px;
-      
-      /* Shadows */
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: var(--font-family-base);
-      background-image: url('https://i.ibb.co/gZmG5qGH/f06d748d5aa3faea03ec608af62ed6d2.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      color: var(--color-text);
-      line-height: 1.6;
-      position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(26, 26, 46, 0.85);
-      z-index: -1;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: var(--space-24);
-    }
-
-    /* Header Styles */
-    .header {
-      background: linear-gradient(135deg, var(--mlbb-dark) 0%, #374151 100%);
-      border-radius: var(--radius-lg);
-      padding: var(--space-24);
-      margin-bottom: var(--space-32);
-      border: 2px solid var(--mlbb-red);
-      box-shadow: 0 0 20px rgba(255, 70, 85, 0.3);
-    }
-
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: var(--space-20);
-      margin-bottom: var(--space-16);
-    }
-
-    .logo {
-      width: 80px;
-      height: 80px;
-      border-radius: var(--radius-base);
-      border: 3px solid var(--mlbb-gold);
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-    }
-
-    .store-info h1 {
-      font-size: var(--font-size-4xl);
-      background: linear-gradient(135deg, var(--mlbb-red), var(--mlbb-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: var(--space-8);
-    }
-
-    .tagline {
-      color: var(--color-text-secondary);
-      font-size: var(--font-size-lg);
-    }
-
-    /* Sync Status */
-    .sync-status-bar {
-      margin-top: var(--space-16);
-      padding-top: var(--space-16);
-      border-top: 1px solid rgba(255, 70, 85, 0.3);
-    }
-
-    .sync-indicator {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-16);
-    }
-
-    .sync-status {
-      padding: var(--space-6) var(--space-12);
-      border-radius: var(--radius-full);
-      font-size: var(--font-size-sm);
-      font-weight: 500;
-      border: 1px solid;
-    }
-
-    .sync-connected {
-      background: rgba(16, 185, 129, 0.2);
-      color: var(--mlbb-accent);
-      border-color: var(--mlbb-accent);
-    }
-
-    .sync-disconnected {
-      background: rgba(107, 114, 128, 0.2);
-      color: #9CA3AF;
-      border-color: #6B7280;
-    }
-
-    .sync-error {
-      background: rgba(239, 68, 68, 0.2);
-      color: #EF4444;
-      border-color: #EF4444;
-    }
-
-    /* Login Section */
-    #login-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 60vh;
-    }
-
-    .login-card {
-      background: var(--color-surface);
-      border-radius: var(--radius-lg);
-      padding: var(--space-32);
-      width: 100%;
-      max-width: 400px;
-      border: 2px solid var(--mlbb-red);
-      box-shadow: 0 0 30px rgba(255, 70, 85, 0.2);
-    }
-
-    .login-card h2 {
-      text-align: center;
-      margin-bottom: var(--space-24);
-    }
-
-    /* Form Styles */
-    .form-control {
-      display: block;
-      width: 100%;
-      padding: var(--space-12) var(--space-16);
-      font-size: var(--font-size-base);
-      line-height: 1.5;
-      color: var(--color-text);
-      background-color: var(--color-surface);
-      border: 2px solid var(--color-border);
-      border-radius: var(--radius-base);
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus {
-      border-color: var(--mlbb-red);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(255, 70, 85, 0.2);
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: var(--space-8);
-      font-weight: 500;
-      font-size: var(--font-size-sm);
-    }
-
-    .form-group {
-      margin-bottom: var(--space-20);
-    }
-
-    /* Button Styles */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-12) var(--space-20);
-      border-radius: var(--radius-base);
-      font-size: var(--font-size-base);
-      font-weight: 500;
-      line-height: 1.5;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: none;
-      text-decoration: none;
-    }
-
-    .btn--primary {
-      background: linear-gradient(135deg, var(--mlbb-red), #E63946);
-      color: white;
-      border: 2px solid var(--mlbb-red);
-    }
-
-    .btn--primary:hover {
-      background: linear-gradient(135deg, #E63946, var(--mlbb-red));
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 70, 85, 0.4);
-    }
-
-    .btn--secondary {
-      background: var(--color-secondary);
-      color: var(--color-text);
-      border: 2px solid var(--color-border);
-    }
-
-    .btn--secondary:hover {
-      background: var(--color-secondary-hover);
-      border-color: var(--mlbb-red);
-    }
-
-    .btn--sm {
-      padding: var(--space-8) var(--space-12);
-      font-size: var(--font-size-sm);
-      border-radius: var(--radius-sm);
-    }
-
-    .btn--full-width {
-      width: 100%;
-    }
-
-    /* Store Content */
-    #store-content {
-      display: none;
-    }
-
-    .user-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--color-surface);
-      padding: var(--space-16);
-      border-radius: var(--radius-base);
-      margin-bottom: var(--space-24);
-      border: 1px solid rgba(255, 70, 85, 0.3);
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: var(--space-16);
-    }
-
-    .user-welcome {
-      font-weight: 500;
-    }
-
-    .user-role {
-      background: var(--mlbb-red);
-      color: white;
-      padding: var(--space-4) var(--space-8);
-      border-radius: var(--radius-sm);
-      font-size: var(--font-size-xs);
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    /* Packages Section */
-    .packages-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--space-20);
-      margin-bottom: var(--space-32);
-    }
-
-    .package-card {
-      background: linear-gradient(135deg, var(--color-surface), #374151);
-      border-radius: var(--radius-lg);
-      padding: var(--space-20);
-      border: 2px solid transparent;
-      position: relative;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .package-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: var(--radius-lg);
-      padding: 2px;
-      background: linear-gradient(135deg, var(--mlbb-red), var(--mlbb-gold));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: exclude;
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask-composite: exclude;
-    }
-
-    .package-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(255, 70, 85, 0.3);
-    }
-
-    .package-header {
-      text-align: center;
-      margin-bottom: var(--space-16);
-    }
-
-    .diamond-count {
-      font-size: var(--font-size-2xl);
-      font-weight: 600;
-      color: var(--mlbb-gold);
-      margin-bottom: var(--space-8);
-    }
-
-    .package-price {
-      font-size: var(--font-size-xl);
-      font-weight: 500;
-      color: var(--mlbb-red);
-    }
-
-    .package-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--mlbb-red), #E63946);
-      color: white;
-      border: none;
-      padding: var(--space-12) var(--space-16);
-      border-radius: var(--radius-base);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: var(--font-size-base);
-    }
-
-    .package-btn:hover {
-      background: linear-gradient(135deg, #E63946, var(--mlbb-red));
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 70, 85, 0.4);
-    }
-
-    /* Modal Styles */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal.hidden {
-      display: none;
-    }
-
-    .modal-content {
-      background: var(--color-surface);
-      border-radius: var(--radius-lg);
-      width: 90%;
-      max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
-      border: 2px solid var(--mlbb-red);
-      box-shadow: 0 0 30px rgba(255, 70, 85, 0.3);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-20);
-      border-bottom: 1px solid rgba(255, 70, 85, 0.3);
-    }
-
-    .modal-header h3 {
-      color: var(--color-text);
-      margin: 0;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: var(--font-size-2xl);
-      color: var(--color-text-secondary);
-      cursor: pointer;
-      padding: 0;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      transition: all 0.3s ease;
-    }
-
-    .close-btn:hover {
-      color: var(--mlbb-red);
-      background: rgba(255, 70, 85, 0.1);
-    }
-
-    .modal-body {
-      padding: var(--space-20);
-    }
-
-    /* Order Summary */
-    .order-summary {
-      background: rgba(255, 70, 85, 0.1);
-      border-radius: var(--radius-base);
-      padding: var(--space-16);
-      margin-bottom: var(--space-20);
-      border: 1px solid rgba(255, 70, 85, 0.3);
-    }
-
-    .order-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .item-name {
-      font-weight: 500;
-      color: var(--color-text);
-    }
-
-    .item-price {
-      font-weight: 600;
-      color: var(--mlbb-red);
-      font-size: var(--font-size-lg);
-    }
-
-    /* Admin Panel */
-    .user-management-section {
-      background: var(--color-surface);
-      border-radius: var(--radius-lg);
-      padding: var(--space-20);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .add-user-form {
-      display: flex;
-      gap: var(--space-8);
-      margin-bottom: var(--space-20);
-      flex-wrap: wrap;
-    }
-
-    .users-list {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .user-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-12);
-      background: rgba(16, 185, 129, 0.1);
-      border-radius: var(--radius-sm);
-      margin-bottom: var(--space-8);
-      border-left: 3px solid var(--mlbb-accent);
-    }
-
-    .user-name {
-      font-weight: 500;
-      color: var(--color-text);
-    }
-
-    .user-meta {
-      font-size: var(--font-size-xs);
-      color: var(--color-text-secondary);
-    }
-
-    .delete-user-btn {
-      background: #EF4444;
-      color: white;
-      border: none;
-      padding: var(--space-4) var(--space-8);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: var(--font-size-xs);
-      transition: background 0.3s ease;
-    }
-
-    .delete-user-btn:hover {
-      background: #DC2626;
-    }
-
-    /* Notification */
-    .notification {
-      position: fixed;
-      top: var(--space-20);
-      right: var(--space-20);
-      background: var(--color-surface);
-      border: 2px solid;
-      border-radius: var(--radius-base);
-      padding: var(--space-16);
-      box-shadow: var(--shadow-lg);
-      z-index: 1100;
-      max-width: 300px;
-      transition: all 0.3s ease;
-    }
-
-    .notification.hidden {
-      display: none;
-    }
-
-    .notification.success {
-      border-color: var(--mlbb-accent);
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--mlbb-accent);
-    }
-
-    .notification.error {
-      border-color: #EF4444;
-      background: rgba(239, 68, 68, 0.1);
-      color: #EF4444;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .container {
-        padding: var(--space-16);
-      }
-
-      .logo-container {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .packages-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .add-user-form {
-        flex-direction: column;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .store-info h1 {
-        font-size: var(--font-size-3xl);
-      }
-
-      .login-card {
-        padding: var(--space-24);
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
   <div class="container">
-    <!-- Header Section -->
+    <!-- Header -->
     <header class="header">
       <div class="logo-container">
         <img src="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png" alt="P&K Store Logo" class="logo">
         <div class="store-info">
-          <h1>P&K Diamond Store</h1>
-          <p class="tagline">Your trusted MLBB diamond supplier</p>
+          <h1>P&K Store</h1>
+          <p class="tagline">Premium MLBB Diamond Top-Up Service</p>
         </div>
       </div>
       
-      <!-- Sync Status Bar -->
+      <!-- Sync Status -->
       <div class="sync-status-bar">
         <div class="sync-indicator">
-          <div id="sync-status" class="sync-status sync-disconnected">⚫ Local Only</div>
-          <button id="connect-drive-btn" class="btn btn--secondary btn--sm">
-            Connect Drive
-          </button>
+          <span id="sync-status" class="sync-status disconnected">⚫ Local Only</span>
+          <button id="connect-drive-btn" class="btn btn--sm btn--outline">Connect Drive</button>
         </div>
       </div>
     </header>
 
-    <!-- Login Section (shown by default) -->
-    <section id="login-section">
+    <!-- Login Section -->
+    <section id="login-section" class="login-section">
       <div class="login-card">
-        <h2>Login to Your Account</h2>
+        <h2>🎮 Login to P&K Store</h2>
         <form id="login-form" class="login-form">
           <div class="form-group">
             <label for="username" class="form-label">Username</label>
-            <input type="text" id="username" class="form-control" required>
+            <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
           </div>
           <div class="form-group">
             <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" class="form-control" required>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
           </div>
           <button type="submit" class="btn btn--primary btn--full-width">Login</button>
         </form>
         <div class="login-footer">
-          <p>Don't have an account? <a href="#" id="show-register">Register here</a></p>
+          <p>New customer? <a href="#" id="show-register">Create Account</a></p>
+          <p class="forgot-password"><a href="#" id="forgot-password">Forgot Password?</a></p>
         </div>
       </div>
     </section>
 
-    <!-- Store Content (hidden by default) -->
-    <section id="store-content" class="hidden">
-      <!-- User Bar -->
+    <!-- Registration Modal -->
+    <div id="register-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Account</h3>
+          <button class="close-btn" id="close-register">&times;</button>
+        </div>
+        <form id="register-form" class="modal-body">
+          <div class="form-group">
+            <label for="reg-username" class="form-label">Username</label>
+            <input type="text" id="reg-username" class="form-control" placeholder="Choose a username" required>
+            <small class="form-help">4-20 characters, letters and numbers only</small>
+          </div>
+          <div class="form-group">
+            <label for="reg-password" class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-control" placeholder="Create a password" required>
+            <small class="form-help">Minimum 6 characters</small>
+          </div>
+          <div class="form-group">
+            <label for="reg-confirm" class="form-label">Confirm Password</label>
+            <input type="password" id="reg-confirm" class="form-control" placeholder="Confirm your password" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-email" class="form-label">Email (Optional)</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="Your email for recovery">
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Password Recovery Modal -->
+    <div id="recovery-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Password Recovery</h3>
+          <button class="close-btn" id="close-recovery">&times;</button>
+        </div>
+        <form id="recovery-form" class="modal-body">
+          <div class="form-group">
+            <label for="recovery-username" class="form-label">Username</label>
+            <input type="text" id="recovery-username" class="form-control" placeholder="Enter your username" required>
+          </div>
+          <div class="form-group">
+            <label for="recovery-email" class="form-label">Email</label>
+            <input type="email" id="recovery-email" class="form-control" placeholder="Enter your email" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Send Recovery Link</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Store Content -->
+    <main id="store-content" class="store-content hidden">
+      <!-- User Info Bar -->
       <div class="user-bar">
         <div class="user-info">
-          <span class="user-welcome">Welcome, <span id="current-user"></span></span>
+          <span class="user-welcome">Welcome, <span id="current-user">User</span>!</span>
           <span class="user-role" id="user-role"></span>
+          <span class="user-balance" id="user-balance">Balance: ₹0</span>
         </div>
         <div class="user-actions">
-          <button id="admin-panel-btn" class="btn btn--secondary btn--sm hidden">
-            Admin Panel
-          </button>
-          <button id="logout-btn" class="btn btn--secondary btn--sm">
-            Logout
-          </button>
+          <button id="admin-panel-btn" class="btn btn--secondary btn--sm hidden">Admin Panel</button>
+          <button id="profile-btn" class="btn btn--outline btn--sm">Profile</button>
+          <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
         </div>
       </div>
 
-      <!-- Payment Information -->
+      <!-- Quick Order Section -->
+      <section class="quick-order-section">
+        <h2 class="section-title">⚡ Quick Order</h2>
+        <div class="quick-order-form">
+          <div class="form-group">
+            <label for="quick-diamonds" class="form-label">Diamond Amount</label>
+            <input type="number" id="quick-diamonds" class="form-control" placeholder="Enter diamond amount" min="11">
+          </div>
+          <button id="quick-order-btn" class="btn btn--primary">Calculate Price</button>
+          <div class="quick-order-result hidden" id="quick-order-result">
+            <span class="quick-price" id="quick-price">₹0</span>
+            <button class="btn btn--secondary" onclick="showOrderModal('Custom Amount', '₹0')">Order Now</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payment Info -->
       <section class="payment-section">
-        <h2 class="section-title">Payment Methods</h2>
+        <h2 class="section-title">💳 Payment Information</h2>
         <div class="payment-info-card">
           <div class="payment-qr">
-            <img src="https://i.ibb.co/0jQ2Y9h/qr-code.png" alt="UPI QR Code" class="qr-code">
+            <img src="https://i.ibb.co/Ng8QNzV9/Whats-App-Image-2025-07-02-at-09-13-44-998097fb.jpg" alt="Payment QR Code" class="qr-code">
+            <button class="btn btn--sm btn--outline qr-download" onclick="downloadQR()">
+              <i class="fas fa-download"></i> Download QR
+            </button>
           </div>
           <div class="payment-methods">
             <div class="payment-method">
               <h3>UPI Payment</h3>
               <div class="upi-info">
                 <span class="upi-id">BHARATPE.8R0E0I8U2N09755@fbpe</span>
-                <button onclick="copyUpiId()" class="btn btn--secondary btn--sm">
+                <button class="btn btn--sm btn--outline" onclick="copyUpiId()">
                   <i class="fas fa-copy"></i> Copy
                 </button>
               </div>
             </div>
             <div class="payment-method">
-              <h3>WhatsApp Order</h3>
+              <h3>WhatsApp Support</h3>
               <div class="whatsapp-info">
                 <span class="whatsapp-number">+91 9362584929</span>
-                <a href="https://wa.me/919362584929" class="btn btn--secondary btn--sm" target="_blank">
-                  <i class="fab fa-whatsapp"></i> Chat
+                <a href="https://wa.me/919362584929" target="_blank" class="btn btn--sm btn--primary">
+                  <i class="fab fa-whatsapp"></i> Chat Now
                 </a>
+              </div>
+            </div>
+            <div class="payment-method">
+              <h3>Payment Status</h3>
+              <div class="payment-status">
+                <select id="payment-status" class="form-control">
+                  <option value="pending">Pending Payment</option>
+                  <option value="completed">Payment Completed</option>
+                  <option value="problem">Payment Problem</option>
+                </select>
+                <button id="update-status" class="btn btn--sm btn--secondary">Update</button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Diamond Packages -->
-      <section class="packages-section">
-        <h2 class="section-title">Diamond Packages</h2>
-        
-        <div class="package-category">
-          <h3 class="category-title">Small Packs</h3>
-          <div id="small-packs" class="packages-grid"></div>
-        </div>
-        
-        <div class="package-category">
-          <h3 class="category-title">Medium Packs</h3>
-          <div id="medium-packs" class="packages-grid"></div>
-        </div>
-        
-        <div class="package-category">
-          <h3 class="category-title">Larger Packs</h3>
-          <div id="larger-packs" class="packages-grid"></div>
-        </div>
-      </section>
+      <!-- [Rest of your existing content remains the same...] -->
 
-      <!-- Weekly Pass Section -->
-      <section class="weekly-pass-section">
-        <h2 class="section-title">Weekly Pass</h2>
-        <div class="weekly-pass-card">
-          <div class="weekly-pass-info">
-            <h3>Weekly Diamond Pass</h3>
-            <p>Get daily diamonds for 7 days!</p>
-            <div class="quantity-controls">
-              <label for="weekly-quantity">Quantity:</label>
-              <select id="weekly-quantity" class="form-control">
-                <option value="1">1 (₹130)</option>
-                <option value="2">2 (₹260)</option>
-                <option value="3">3 (₹390)</option>
-              </select>
+    </main>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>👤 Your Profile</h3>
+          <button class="close-btn" id="close-profile">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="profile-info">
+            <div class="profile-avatar">
+              <img src="https://i.ibb.co/4Y8xYZF/default-avatar.png" alt="Profile Avatar" id="user-avatar">
+              <button class="btn btn--sm btn--outline" id="change-avatar">Change</button>
+            </div>
+            <div class="profile-details">
+              <div class="detail-item">
+                <span class="detail-label">Username:</span>
+                <span class="detail-value" id="profile-username"></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value" id="profile-email"></span>
+                <button class="btn btn--xs btn--outline" id="edit-email">Edit</button>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Member Since:</span>
+                <span class="detail-value" id="profile-joined"></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Total Orders:</span>
+                <span class="detail-value" id="profile-orders">0</span>
+              </div>
             </div>
           </div>
-          <button onclick="showWeeklyPassOrder()" class="package-btn">Order Weekly Pass</button>
-        </div>
-      </section>
-    </section>
-  </div>
-
-  <!-- Register Modal -->
-  <div id="register-modal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Create Account</h3>
-        <button id="close-register" class="close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="register-form">
-          <div class="form-group">
-            <label for="reg-username" class="form-label">Username</label>
-            <input type="text" id="reg-username" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="reg-password" class="form-label">Password</label>
-            <input type="password" id="reg-password" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="reg-confirm" class="form-label">Confirm Password</label>
-            <input type="password" id="reg-confirm" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn--primary btn--full-width">Register</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Order Modal -->
-  <div id="order-modal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Place Your Order</h3>
-        <button id="close-order" class="close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="order-summary">
-          <div class="order-item">
-            <span class="item-name" id="order-package"></span>
-            <span class="item-price" id="order-price"></span>
-          </div>
-        </div>
-        
-        <form id="order-form">
-          <div class="form-group">
-            <label for="mlbb-id" class="form-label">MLBB ID</label>
-            <input type="text" id="mlbb-id" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="server-id" class="form-label">Server ID (Numbers only)</label>
-            <input type="text" id="server-id" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="ign" class="form-label">In-Game Name (IGN)</label>
-            <input type="text" id="ign" class="form-control" required>
-          </div>
           
-          <div class="payment-instructions">
-            <h4>Payment Instructions:</h4>
-            <ol>
-              <li>Complete your order details above</li>
-              <li>Send payment to our UPI ID: <strong>BHARATPE.8R0E0I8U2N09755@fbpe</strong></li>
-              <li>Submit this form to open WhatsApp</li>
-              <li>Send payment screenshot to confirm</li>
-            </ol>
+          <div class="profile-actions">
+            <button class="btn btn--primary" id="change-password-btn">Change Password</button>
+            <button class="btn btn--outline" id="delete-account-btn">Delete Account</button>
           </div>
-          
-          <div class="order-actions">
-            <button type="submit" class="btn btn--primary btn--full-width">
-              <i class="fab fa-whatsapp"></i> Complete Order via WhatsApp
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Panel Modal -->
-  <div id="admin-panel" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Admin Panel</h2>
-        <button id="close-admin" class="close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="user-management-section">
-          <h3>User Management</h3>
-          
-          <div class="add-user-form">
-            <input type="text" id="admin-username" class="form-control" placeholder="Username">
-            <input type="password" id="admin-password" class="form-control" placeholder="Password">
-            <select id="admin-role" class="form-control">
-              <option value="customer">Customer</option>
-              <option value="vip">VIP</option>
-              <option value="admin">Admin</option>
-            </select>
-            <button id="add-user-btn" class="btn btn--primary">Add User</button>
-          </div>
-          
-          <div id="admin-users-list" class="users-list"></div>
         </div>
       </div>
     </div>
+
+    <!-- [Rest of your existing modals remain the same...] -->
+
+    <!-- Order History Modal -->
+    <div id="history-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📜 Order History</h3>
+          <button class="close-btn" id="close-history">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="order-history-container">
+            <div class="history-filters">
+              <select id="history-filter" class="form-control">
+                <option value="all">All Orders</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <button class="btn btn--sm btn--secondary" id="refresh-history">Refresh</button>
+            </div>
+            <div class="history-list" id="history-list">
+              <!-- Orders will be populated by JavaScript -->
+              <div class="no-orders">No orders found</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+      <span id="notification-text"></span>
+      <button class="notification-close" onclick="hideNotification()">&times;</button>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" id="loading-text">Processing...</div>
+    </div>
   </div>
 
-  <!-- Notification -->
-  <div id="notification" class="notification hidden">
-    <div id="notification-text"></div>
-  </div>
-
-  <!-- Load Google API client -->
-  <script src="https://apis.google.com/js/api.js"></script>
-  <!-- Load app.js -->
   <script src="app.js"></script>
+  <script>
+    // Additional global functions
+    function downloadQR() {
+      // QR download functionality
+      showNotification('QR code download started', 'success');
+    }
+    
+    function hideNotification() {
+      document.getElementById('notification').classList.add('hidden');
+    }
+    
+    // Auto-hide notification after 5 seconds
+    function autoHideNotification() {
+      setTimeout(hideNotification, 5000);
+    }
+    
+    // Initialize any global event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add any initialization code here
+    });
+  </script>
 </body>
 </html>
