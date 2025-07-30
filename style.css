@@ -1,207 +1,218 @@
-:root {
-  /* Colors */
-  --mlbb-red: #FF4655;
-  --mlbb-gold: #FFD700;
-  --mlbb-blue: #1E3A8A;
-  --mlbb-dark: #1F2937;
-  --mlbb-darker: #111827;
-  --mlbb-light: #F8FAFC;
-  --mlbb-accent: #10B981;
-  
-  /* Spacing */
-  --space-4: 4px;
-  --space-8: 8px;
-  --space-12: 12px;
-  --space-16: 16px;
-  --space-20: 20px;
-  --space-24: 24px;
-  --space-32: 32px;
-  
-  /* Borders */
-  --radius-sm: 4px;
-  --radius-base: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P&K Store - MLBB Diamond Top-Up</title>
+  <link rel="icon" type="image/png" href="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png" alt="P&K Store Logo" class="logo">
+        <div class="store-info">
+          <h1>P&K Store</h1>
+          <p class="tagline">Premium MLBB Diamond Top-Up Service</p>
+        </div>
+      </div>
+      
+      <!-- Sync Status -->
+      <div class="sync-status-bar">
+        <div class="sync-indicator">
+          <span id="sync-status" class="sync-status disconnected">⚫ Local Only</span>
+          <button id="connect-drive-btn" class="btn btn--sm btn--outline">Connect Drive</button>
+        </div>
+      </div>
+    </header>
 
-/* Base Styles */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--mlbb-darker);
-  color: var(--mlbb-light);
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-}
+    <!-- Login Section -->
+    <section id="login-section" class="login-section">
+      <div class="login-card">
+        <h2>🎮 Login to P&K Store</h2>
+        <form id="login-form" class="login-form">
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
+          </div>
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+          <button id="test-login" class="btn btn--sm btn--outline" style="margin-top: 10px;">
+            Test Login (Admin)
+          </button>
+        </form>
+        <div class="login-footer">
+          <p>New customer? <a href="#" id="show-register">Create Account</a></p>
+          <p class="forgot-password"><a href="#" id="forgot-password">Forgot Password?</a></p>
+        </div>
+      </div>
+    </section>
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-24);
-}
+    <!-- Registration Modal -->
+    <div id="register-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Account</h3>
+          <button class="close-btn" id="close-register">&times;</button>
+        </div>
+        <form id="register-form" class="modal-body">
+          <div class="form-group">
+            <label for="reg-username" class="form-label">Username</label>
+            <input type="text" id="reg-username" class="form-control" placeholder="Choose a username" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-password" class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-control" placeholder="Create a password" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-confirm" class="form-label">Confirm Password</label>
+            <input type="password" id="reg-confirm" class="form-control" placeholder="Confirm your password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
+        </form>
+      </div>
+    </div>
 
-/* Header */
-.header {
-  background: linear-gradient(135deg, var(--mlbb-dark), #374151);
-  border-radius: var(--radius-lg);
-  padding: var(--space-24);
-  margin-bottom: var(--space-32);
-  border: 2px solid var(--mlbb-red);
-}
+    <!-- Main Store Content -->
+    <main id="store-content" class="store-content hidden">
+      <!-- User Info Bar -->
+      <div class="user-bar">
+        <div class="user-info">
+          <span class="user-welcome">Welcome, <span id="current-user">User</span>!</span>
+          <span class="user-role" id="user-role"></span>
+        </div>
+        <div class="user-actions">
+          <button id="admin-panel-btn" class="btn btn--secondary btn--sm hidden">Admin Panel</button>
+          <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
+        </div>
+      </div>
 
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: var(--space-20);
-}
+      <!-- Payment Info -->
+      <section class="payment-section">
+        <h2 class="section-title">💳 Payment Information</h2>
+        <div class="payment-info-card">
+          <div class="payment-qr">
+            <img src="https://i.ibb.co/Ng8QNzV9/Whats-App-Image-2025-07-02-at-09-13-44-998097fb.jpg" alt="Payment QR Code" class="qr-code">
+          </div>
+          <div class="payment-method">
+            <h3>UPI Payment</h3>
+            <div class="upi-info">
+              <span class="upi-id">BHARATPE.8R0E0I8U2N09755@fbpe</span>
+              <button class="btn btn--sm btn--outline" onclick="copyUpiId()">Copy UPI ID</button>
+            </div>
+          </div>
+          <div class="payment-method">
+            <h3>WhatsApp Support</h3>
+            <div class="whatsapp-info">
+              <span class="whatsapp-number">+91 9362584929</span>
+              <a href="https://wa.me/919362584929" target="_blank" class="btn btn--sm btn--primary">
+                Chat on WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-.logo {
-  width: 80px;
-  height: 80px;
-  border-radius: var(--radius-base);
-  border: 2px solid var(--mlbb-gold);
-}
+      <!-- Diamond Packages -->
+      <section class="packages-section">
+        <h2 class="section-title">💎 Diamond Packages</h2>
+        
+        <div class="package-category">
+          <h3 class="category-title">Small Packs</h3>
+          <div class="packages-grid" id="small-packs"></div>
+        </div>
 
-/* Login Section */
-.login-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-}
+        <div class="package-category">
+          <h3 class="category-title">Medium Packs</h3>
+          <div class="packages-grid" id="medium-packs"></div>
+        </div>
 
-.login-card {
-  background: var(--mlbb-dark);
-  border-radius: var(--radius-lg);
-  padding: var(--space-32);
-  width: 100%;
-  max-width: 400px;
-  border: 2px solid var(--mlbb-red);
-}
+        <div class="package-category">
+          <h3 class="category-title">Premium Packs</h3>
+          <div class="packages-grid" id="larger-packs"></div>
+        </div>
+      </section>
+    </main>
 
-/* Forms */
-.form-control {
-  width: 100%;
-  padding: var(--space-12) var(--space-16);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-base);
-  background: rgba(0,0,0,0.2);
-  color: white;
-  margin-bottom: var(--space-16);
-}
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel hidden">
+      <div class="admin-header">
+        <h2>🛠️ Admin Panel</h2>
+        <button id="close-admin" class="btn btn--outline btn--sm">Close</button>
+      </div>
+      <div class="admin-body">
+        <div class="user-management-section">
+          <h3>👥 User Management</h3>
+          <div class="add-user-form">
+            <input type="text" id="admin-username" class="form-control" placeholder="Username">
+            <input type="password" id="admin-password" class="form-control" placeholder="Password">
+            <select id="admin-role" class="form-control">
+              <option value="customer">Customer</option>
+              <option value="vip">VIP</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button id="add-user-btn" class="btn btn--primary">Add User</button>
+          </div>
+          <div class="users-list" id="admin-users-list"></div>
+        </div>
+      </div>
+    </div>
 
-.form-control:focus {
-  outline: none;
-  border-color: var(--mlbb-red);
-}
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Complete Your Order</h3>
+          <button class="close-btn" id="close-order">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="order-summary">
+            <div class="order-item">
+              <span class="item-name" id="order-package">Package Name</span>
+              <span class="item-price" id="order-price">₹ 0</span>
+            </div>
+          </div>
+          
+          <form id="order-form">
+            <div class="form-group">
+              <label for="mlbb-id" class="form-label">MLBB ID</label>
+              <input type="text" id="mlbb-id" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="server-id" class="form-label">Server ID</label>
+              <input type="number" id="server-id" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="ign" class="form-label">IGN</label>
+              <input type="text" id="ign" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full-width">
+              📱 Send Order via WhatsApp
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
 
-/* Buttons */
-.btn {
-  padding: var(--space-12) var(--space-20);
-  border-radius: var(--radius-base);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+      <span id="notification-text"></span>
+    </div>
 
-.btn--primary {
-  background: var(--mlbb-red);
-  color: white;
-  border: none;
-}
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Processing...</div>
+    </div>
+  </div>
 
-.btn--primary:hover {
-  background: #E63946;
-}
-
-.btn--secondary {
-  background: rgba(255,255,255,0.1);
-  color: white;
-  border: none;
-}
-
-.btn--outline {
-  background: transparent;
-  border: 1px solid var(--mlbb-red);
-  color: var(--mlbb-red);
-}
-
-.btn--sm {
-  padding: var(--space-8) var(--space-12);
-  font-size: 0.9rem;
-}
-
-.btn--full-width {
-  width: 100%;
-}
-
-/* Packages */
-.packages-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: var(--space-20);
-  margin-bottom: var(--space-32);
-}
-
-.package-card {
-  background: rgba(0,0,0,0.2);
-  border-radius: var(--radius-lg);
-  padding: var(--space-20);
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-/* Modals */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: var(--mlbb-dark);
-  border-radius: var(--radius-lg);
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-/* Loading Overlay */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.loading-spinner {
-  border: 4px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  border-top: 4px solid var(--mlbb-red);
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Utility Classes */
-.hidden {
-  display: none !important;
-}
+  <script src="app.js"></script>
+</body>
+</html>
