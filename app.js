@@ -3,7 +3,7 @@ const CONFIG = {
   GOOGLE_CLIENT_ID: '856647789843-teunsdqh8coqkicbq1rhgnesqpr5stkl.apps.googleusercontent.com',
   DISCOVERY_DOCS: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
   SCOPES: 'https://www.googleapis.com/auth/drive.file',
-  USER_DATA_FILENAME: 'pk-store-users.json',
+  USER_DATA_FILENAME: 'pk-store-global-users.json',
   WHATSAPP_NUMBER: '9362584929',
   UPI_ID: 'BHARATPE.8R0E0I8U2N09755@fbpe'
 };
@@ -35,13 +35,13 @@ const DIAMOND_PACKAGES = {
   ]
 };
 
-// Default Users
-const DEFAULT_USERS = [
-  { username: "admin", password: "admin123", role: "admin", lastModified: Date.now() },
-  { username: "customer1", password: "pass123", role: "customer", lastModified: Date.now() },
-  { username: "customer2", password: "pass456", role: "customer", lastModified: Date.now() },
-  { username: "vip_user", password: "vip789", role: "vip", lastModified: Date.now() }
-];
+// Default Admin User
+const DEFAULT_ADMIN = { 
+  username: "admin", 
+  password: "admin123", 
+  role: "admin", 
+  lastModified: Date.now() 
+};
 
 // Google Drive Sync Class
 class DriveSync {
@@ -81,37 +81,168 @@ class DriveSync {
     }
   }
 
-  async authenticate() {
+  async getGlobalUsers() {
     if (!this.isInitialized) {
-      console.log('Drive sync not initialized');
-      return false;
+      await this.initialize();
     }
     
     try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      if (!authInstance.isSignedIn.get()) {
-        await authInstance.signIn();
+      // Check if file exists
+      const response = await gapi.client.drive.files.list({
+        q: `name='${this.USER_DATA_FILENAME}' and trashed=false`,
+        fields: 'files(id)'
+      });
+      
+      if (response.result.files.length === 0) {
+        // Create new file with default admin user
+        return await this.createGlobalUsersFile([DEFAULT_ADMIN]);
       }
-      this.isAuthenticated = true;
-      this.updateSyncStatus('connected');
-      return true;
+      
+      this.fileId = response.result.files[0].id;
+      
+      // Get file content
+      const fileResponse = await gapi.client.drive.files.get({
+        fileId: this.fileId,
+        alt: 'media'
+      });
+      
+      return fileResponse.result;
     } catch (error) {
-      console.error('Authentication failed:', error);
-      this.updateSyncStatus('error');
-      return false;
+      console.error('Error getting global users:', error);
+      throw error;
     }
   }
 
-  async signOut() {
-    if (!this.isInitialized) return;
-    
+  async createGlobalUsersFile(users) {
     try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      await authInstance.signOut();
-      this.isAuthenticated = false;
-      this.updateSyncStatus('disconnected');
+      const fileContent = JSON.stringify(users);
+      
+      const file = await gapi.client.drive.files.create({
+        resource: {
+          name: this.USER_DATA_FILENAME,
+          mimeType: 'application/json'
+        },
+        media: {
+          mimeType: 'application/json',
+          body: fileContent
+        },
+        fields: 'id'
+      });
+      
+      this.fileId = file.result.id;
+      return users;
     } catch (error) {
-      console.error('Sign out failed:', error);
+      console.error('Error creating global users file:', error);
+      throw error;
+    }
+  }
+
+  async addNewUser(newUser) {
+    try {
+      // Get current users
+      const users = await this.getGlobalUsers();
+      
+      // Check if user already exists
+      if (users.some(u => u.username === newUser.username)) {
+        throw new Error('Username already exists');
+      }
+      
+      // Add new user
+      users.push({
+        ...newUser,
+        lastModified: Date.now()
+      });
+      
+      // Update file
+      await gapi.client.drive.files.update({
+        fileId: this.fileId,
+        media: {
+          mimeType: 'application/json',
+          body: JSON.stringify(users)
+        }
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error adding new user:', error);
+      throw error;
+    }
+  }
+
+  async authenticateUser(username, password) {
+    try {
+      const users = await this.getGlobalUsers();
+      const user = users.find(u => u.username === username && u.password === password);
+      
+      if (user) {
+        return user;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error authenticating user:', error);
+      throw error;
+    }
+  }
+
+  async getAllUsers() {
+    try {
+      return await this.getGlobalUsers();
+    } catch (error) {
+      console.error('Error getting all users:', error);
+      throw error;
+    }
+  }
+
+  async updateUser(updatedUser) {
+    try {
+      const users = await this.getGlobalUsers();
+      const index = users.findIndex(u => u.username === updatedUser.username);
+      
+      if (index === -1) {
+        throw new Error('User not found');
+      }
+      
+      users[index] = {
+        ...updatedUser,
+        lastModified: Date.now()
+      };
+      
+      await gapi.client.drive.files.update({
+        fileId: this.fileId,
+        media: {
+          mimeType: 'application/json',
+          body: JSON.stringify(users)
+        }
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
+  }
+
+  async deleteUser(username) {
+    try {
+      const users = await this.getGlobalUsers();
+      const filteredUsers = users.filter(u => u.username !== username);
+      
+      if (filteredUsers.length === users.length) {
+        throw new Error('User not found');
+      }
+      
+      await gapi.client.drive.files.update({
+        fileId: this.fileId,
+        media: {
+          mimeType: 'application/json',
+          body: JSON.stringify(filteredUsers)
+        }
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
     }
   }
 
@@ -138,7 +269,6 @@ class PKStoreApp {
   constructor() {
     this.driveSync = new DriveSync();
     this.currentUser = null;
-    this.users = [];
     this.isLoggedIn = false;
     this.currentOrder = null;
   }
@@ -146,55 +276,19 @@ class PKStoreApp {
   async initialize() {
     console.log('Initializing P&K Store App...');
     
-    // Load users from localStorage first
-    this.loadLocalUsers();
-    console.log('Users loaded:', this.users.length);
-    
-    // Initialize Google Drive API (non-blocking)
-    this.driveSync.initialize().then(() => {
-      console.log('Drive sync initialized');
-    });
+    // Initialize Google Drive API
+    await this.driveSync.initialize();
     
     // Setup event listeners
     this.setupEventListeners();
-    console.log('Event listeners setup complete');
     
     // Render diamond packages
     this.renderDiamondPackages();
-    console.log('Diamond packages rendered');
     
-    // Check login state
+    // Check login state from session
     this.checkLoginState();
-    console.log('Login state checked');
     
     console.log('App initialization complete');
-  }
-
-  loadLocalUsers() {
-    try {
-      const stored = localStorage.getItem('pk-store-users');
-      if (stored) {
-        this.users = JSON.parse(stored);
-        console.log('Loaded users from localStorage:', this.users);
-      } else {
-        this.users = [...DEFAULT_USERS];
-        this.saveLocalUsers();
-        console.log('Created default users:', this.users);
-      }
-    } catch (error) {
-      console.error('Error loading users:', error);
-      this.users = [...DEFAULT_USERS];
-      this.saveLocalUsers();
-    }
-  }
-
-  saveLocalUsers() {
-    try {
-      localStorage.setItem('pk-store-users', JSON.stringify(this.users));
-      console.log('Saved users to localStorage');
-    } catch (error) {
-      console.error('Error saving users:', error);
-    }
   }
 
   setupEventListeners() {
@@ -205,12 +299,8 @@ class PKStoreApp {
     if (loginForm) {
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        console.log('Login form submitted');
         this.handleLogin(e);
       });
-      console.log('Login form listener added');
-    } else {
-      console.error('Login form not found!');
     }
     
     // Registration
@@ -218,20 +308,14 @@ class PKStoreApp {
     if (showRegisterBtn) {
       showRegisterBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        const modal = document.getElementById('register-modal');
-        if (modal) {
-          modal.classList.remove('hidden');
-        }
+        document.getElementById('register-modal').classList.remove('hidden');
       });
     }
     
     const closeRegisterBtn = document.getElementById('close-register');
     if (closeRegisterBtn) {
       closeRegisterBtn.addEventListener('click', () => {
-        const modal = document.getElementById('register-modal');
-        if (modal) {
-          modal.classList.add('hidden');
-        }
+        document.getElementById('register-modal').classList.add('hidden');
       });
     }
     
@@ -259,18 +343,6 @@ class PKStoreApp {
       closeAdminBtn.addEventListener('click', () => this.hideAdminPanel());
     }
     
-    // Google Drive connection
-    const connectDriveBtn = document.getElementById('connect-drive-btn');
-    if (connectDriveBtn) {
-      connectDriveBtn.addEventListener('click', () => this.toggleDriveConnection());
-    }
-    
-    // Admin functions
-    const addUserBtn = document.getElementById('add-user-btn');
-    if (addUserBtn) {
-      addUserBtn.addEventListener('click', () => this.handleAddUser());
-    }
-    
     // Order modal
     const closeOrderBtn = document.getElementById('close-order');
     if (closeOrderBtn) {
@@ -289,11 +361,9 @@ class PKStoreApp {
     const serverIdField = document.getElementById('server-id');
     if (serverIdField) {
       serverIdField.addEventListener('input', (e) => {
-        // Remove any non-numeric characters
         e.target.value = e.target.value.replace(/[^0-9]/g, '');
       });
       serverIdField.addEventListener('keypress', (e) => {
-        // Prevent non-numeric input
         if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Escape', 'Enter'].includes(e.key)) {
           e.preventDefault();
         }
@@ -306,52 +376,48 @@ class PKStoreApp {
         e.target.classList.add('hidden');
       }
     });
-    
-    console.log('Event listeners setup completed');
   }
 
-  handleLogin(e) {
+  async handleLogin(e) {
     e.preventDefault();
     console.log('Processing login...');
     
-    const usernameField = document.getElementById('username');
-    const passwordField = document.getElementById('password');
-    
-    if (!usernameField || !passwordField) {
-      console.error('Username or password field not found');
-      this.showNotification('Login form error', 'error');
-      return;
-    }
-    
-    const username = usernameField.value.trim();
-    const password = passwordField.value;
-    
-    console.log('Login attempt for username:', username);
-    console.log('Available users:', this.users.map(u => u.username));
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
     
     if (!username || !password) {
       this.showNotification('Please enter both username and password', 'error');
       return;
     }
     
-    const user = this.users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-      console.log('Login successful for user:', user.username);
-      this.currentUser = user;
-      this.isLoggedIn = true;
-      localStorage.setItem('pk-store-current-user', JSON.stringify(user));
+    try {
+      // Authenticate against global users file
+      const user = await this.driveSync.authenticateUser(username, password);
       
-      this.showStoreContent();
-      this.showNotification(`Welcome back, ${user.username}!`, 'success');
-    } else {
-      console.log('Login failed - invalid credentials');
-      console.log('Entered username:', username, 'password:', password);
-      this.showNotification('Invalid username or password', 'error');
+      if (user) {
+        console.log('Login successful for user:', user.username);
+        this.currentUser = user;
+        this.isLoggedIn = true;
+        
+        // Store minimal session info
+        sessionStorage.setItem('pk-store-session', JSON.stringify({
+          username: user.username,
+          timestamp: Date.now()
+        }));
+        
+        this.showStoreContent();
+        this.showNotification(`Welcome back, ${user.username}!`, 'success');
+      } else {
+        console.log('Login failed - invalid credentials');
+        this.showNotification('Invalid username or password', 'error');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      this.showNotification('Error during login. Please try again.', 'error');
     }
   }
 
-  handleRegister(e) {
+  async handleRegister(e) {
     e.preventDefault();
     
     const username = document.getElementById('reg-username').value.trim();
@@ -368,67 +434,71 @@ class PKStoreApp {
       return;
     }
     
-    if (this.users.find(u => u.username === username)) {
-      this.showNotification('Username already exists', 'error');
-      return;
+    try {
+      // Add new user to global file
+      await this.driveSync.addNewUser({
+        username,
+        password,
+        role: 'customer'
+      });
+      
+      const modal = document.getElementById('register-modal');
+      if (modal) modal.classList.add('hidden');
+      
+      // Clear form
+      document.getElementById('reg-username').value = '';
+      document.getElementById('reg-password').value = '';
+      document.getElementById('reg-confirm').value = '';
+      
+      this.showNotification('Account created successfully! Please login.', 'success');
+    } catch (error) {
+      if (error.message === 'Username already exists') {
+        this.showNotification('Username already exists', 'error');
+      } else {
+        console.error('Registration error:', error);
+        this.showNotification('Error creating account. Please try again.', 'error');
+      }
     }
-    
-    const newUser = {
-      username,
-      password,
-      role: 'customer',
-      lastModified: Date.now()
-    };
-    
-    this.users.push(newUser);
-    this.saveLocalUsers();
-    
-    const modal = document.getElementById('register-modal');
-    if (modal) {
-      modal.classList.add('hidden');
+  }
+
+  checkLoginState() {
+    try {
+      const session = sessionStorage.getItem('pk-store-session');
+      if (session) {
+        const { username, timestamp } = JSON.parse(session);
+        
+        // Check if session is recent (within 24 hours)
+        if (Date.now() - timestamp < 86400000) {
+          // Session is valid, set as current user
+          this.currentUser = { username }; // Minimal user info
+          this.isLoggedIn = true;
+          this.showStoreContent();
+          console.log('Auto-logged in user:', username);
+        } else {
+          // Session expired
+          sessionStorage.removeItem('pk-store-session');
+        }
+      }
+    } catch (error) {
+      console.error('Error checking login state:', error);
+      sessionStorage.removeItem('pk-store-session');
     }
-    
-    // Clear form
-    document.getElementById('reg-username').value = '';
-    document.getElementById('reg-password').value = '';
-    document.getElementById('reg-confirm').value = '';
-    
-    this.showNotification('Account created successfully! Please login.', 'success');
   }
 
   showStoreContent() {
     console.log('Showing store content for user:', this.currentUser.username);
     
-    // Completely hide login section
-    const loginSection = document.getElementById('login-section');
-    const storeContent = document.getElementById('store-content');
-    
-    if (loginSection) {
-      loginSection.classList.add('hidden');
-      console.log('Login section hidden');
-    }
-    if (storeContent) {
-      storeContent.classList.remove('hidden');
-      console.log('Store content shown');
-    }
+    // Hide login section, show store content
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('store-content').classList.remove('hidden');
     
     // Update user info
-    const currentUserSpan = document.getElementById('current-user');
-    const userRoleSpan = document.getElementById('user-role');
-    
-    if (currentUserSpan) {
-      currentUserSpan.textContent = this.currentUser.username;
-    }
-    if (userRoleSpan) {
-      userRoleSpan.textContent = this.currentUser.role.toUpperCase();
-    }
+    document.getElementById('current-user').textContent = this.currentUser.username;
+    document.getElementById('user-role').textContent = this.currentUser.role.toUpperCase();
     
     // Show admin panel button if admin
     if (this.currentUser.role === 'admin') {
-      const adminPanelBtn = document.getElementById('admin-panel-btn');
-      if (adminPanelBtn) {
-        adminPanelBtn.classList.remove('hidden');
-      }
+      document.getElementById('admin-panel-btn').classList.remove('hidden');
     }
   }
 
@@ -437,67 +507,16 @@ class PKStoreApp {
     
     this.currentUser = null;
     this.isLoggedIn = false;
-    localStorage.removeItem('pk-store-current-user');
+    sessionStorage.removeItem('pk-store-session');
     
-    const loginSection = document.getElementById('login-section');
-    const storeContent = document.getElementById('store-content');
-    const adminPanel = document.getElementById('admin-panel');
-    
-    if (loginSection) {
-      loginSection.classList.remove('hidden');
-    }
-    if (storeContent) {
-      storeContent.classList.add('hidden');
-    }
-    if (adminPanel) {
-      adminPanel.classList.add('hidden');
-    }
+    document.getElementById('login-section').classList.remove('hidden');
+    document.getElementById('store-content').classList.add('hidden');
     
     // Clear login form
-    const usernameField = document.getElementById('username');
-    const passwordField = document.getElementById('password');
-    if (usernameField) usernameField.value = '';
-    if (passwordField) passwordField.value = '';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
     
     this.showNotification('Logged out successfully', 'info');
-  }
-
-  checkLoginState() {
-    try {
-      const storedUser = localStorage.getItem('pk-store-current-user');
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        // Verify user still exists
-        if (this.users.find(u => u.username === user.username)) {
-          this.currentUser = user;
-          this.isLoggedIn = true;
-          this.showStoreContent();
-          console.log('Auto-logged in user:', user.username);
-        } else {
-          localStorage.removeItem('pk-store-current-user');
-        }
-      }
-    } catch (error) {
-      console.error('Error checking login state:', error);
-      localStorage.removeItem('pk-store-current-user');
-    }
-  }
-
-  async toggleDriveConnection() {
-    if (!this.driveSync.isAuthenticated) {
-      this.showNotification('Connecting to Google Drive...', 'info');
-      const success = await this.driveSync.authenticate();
-      if (success) {
-        document.getElementById('connect-drive-btn').textContent = 'Disconnect Drive';
-        this.showNotification('Connected to Google Drive!', 'success');
-      } else {
-        this.showNotification('Failed to connect to Google Drive', 'error');
-      }
-    } else {
-      await this.driveSync.signOut();
-      document.getElementById('connect-drive-btn').textContent = 'Connect Drive';
-      this.showNotification('Disconnected from Google Drive', 'info');
-    }
   }
 
   renderDiamondPackages() {
@@ -562,42 +581,24 @@ class PKStoreApp {
     
     this.currentOrder = { packageName, price };
     
-    const packageElement = document.getElementById('order-package');
-    const priceElement = document.getElementById('order-price');
-    const modal = document.getElementById('order-modal');
-    
-    if (packageElement) packageElement.textContent = packageName;
-    if (priceElement) priceElement.textContent = price;
-    if (modal) modal.classList.remove('hidden');
+    document.getElementById('order-package').textContent = packageName;
+    document.getElementById('order-price').textContent = price;
+    document.getElementById('order-modal').classList.remove('hidden');
   }
 
   closeOrderModal() {
-    const modal = document.getElementById('order-modal');
-    const mlbbIdField = document.getElementById('mlbb-id');
-    const serverIdField = document.getElementById('server-id');
-    const ignField = document.getElementById('ign');
-    
-    if (modal) modal.classList.add('hidden');
-    if (mlbbIdField) mlbbIdField.value = '';
-    if (serverIdField) serverIdField.value = '';
-    if (ignField) ignField.value = '';
+    document.getElementById('order-modal').classList.add('hidden');
+    document.getElementById('mlbb-id').value = '';
+    document.getElementById('server-id').value = '';
+    document.getElementById('ign').value = '';
     
     this.currentOrder = null;
   }
 
   sendWhatsAppOrder() {
-    const mlbbIdField = document.getElementById('mlbb-id');
-    const serverIdField = document.getElementById('server-id');
-    const ignField = document.getElementById('ign');
-    
-    if (!mlbbIdField || !serverIdField || !ignField) {
-      this.showNotification('Form fields not found', 'error');
-      return;
-    }
-    
-    const mlbbId = mlbbIdField.value.trim();
-    const serverId = serverIdField.value.trim();
-    const ign = ignField.value.trim();
+    const mlbbId = document.getElementById('mlbb-id').value.trim();
+    const serverId = document.getElementById('server-id').value.trim();
+    const ign = document.getElementById('ign').value.trim();
     
     if (!mlbbId || !serverId || !ign) {
       this.showNotification('Please fill in all fields', 'error');
@@ -631,8 +632,7 @@ Please confirm this order!`;
     this.showNotification('Order sent via WhatsApp!', 'success');
   }
 
-  // Admin Functions
-  showAdminPanel() {
+  async showAdminPanel() {
     if (this.currentUser.role !== 'admin') {
       this.showNotification('Access denied', 'error');
       return;
@@ -641,102 +641,99 @@ Please confirm this order!`;
     const adminPanel = document.getElementById('admin-panel');
     if (adminPanel) {
       adminPanel.classList.remove('hidden');
-      this.renderAdminUsers();
+      await this.renderAdminUsers();
     }
   }
 
   hideAdminPanel() {
-    const adminPanel = document.getElementById('admin-panel');
-    if (adminPanel) {
-      adminPanel.classList.add('hidden');
-    }
+    document.getElementById('admin-panel').classList.add('hidden');
   }
 
-  handleAddUser() {
-    const usernameField = document.getElementById('admin-username');
-    const passwordField = document.getElementById('admin-password');
-    const roleField = document.getElementById('admin-role');
-    
-    if (!usernameField || !passwordField || !roleField) {
-      this.showNotification('Admin form fields not found', 'error');
-      return;
-    }
-    
-    const username = usernameField.value.trim();
-    const password = passwordField.value;
-    const role = roleField.value;
+  async handleAddUser() {
+    const username = document.getElementById('admin-username').value.trim();
+    const password = document.getElementById('admin-password').value;
+    const role = document.getElementById('admin-role').value;
     
     if (!username || !password || !role) {
       this.showNotification('Please fill in all fields', 'error');
       return;
     }
     
-    if (this.users.find(u => u.username === username)) {
-      this.showNotification('Username already exists', 'error');
-      return;
+    try {
+      await this.driveSync.addNewUser({
+        username,
+        password,
+        role
+      });
+      
+      // Clear form
+      document.getElementById('admin-username').value = '';
+      document.getElementById('admin-password').value = '';
+      document.getElementById('admin-role').value = '';
+      
+      await this.renderAdminUsers();
+      this.showNotification(`User "${username}" added successfully`, 'success');
+    } catch (error) {
+      if (error.message === 'Username already exists') {
+        this.showNotification('Username already exists', 'error');
+      } else {
+        console.error('Error adding user:', error);
+        this.showNotification('Error adding user. Please try again.', 'error');
+      }
     }
-    
-    const newUser = {
-      username,
-      password,
-      role,
-      lastModified: Date.now()
-    };
-    
-    this.users.push(newUser);
-    this.saveLocalUsers();
-    
-    // Clear form
-    usernameField.value = '';
-    passwordField.value = '';
-    roleField.value = '';
-    
-    this.renderAdminUsers();
-    this.showNotification(`User "${username}" added successfully`, 'success');
   }
 
-  deleteUser(username) {
+  async deleteUser(username) {
     if (username === this.currentUser.username) {
       this.showNotification('Cannot delete your own account', 'error');
       return;
     }
     
-    this.users = this.users.filter(u => u.username !== username);
-    this.saveLocalUsers();
-    
-    this.renderAdminUsers();
-    this.showNotification(`User "${username}" deleted`, 'info');
+    try {
+      await this.driveSync.deleteUser(username);
+      await this.renderAdminUsers();
+      this.showNotification(`User "${username}" deleted`, 'info');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      this.showNotification('Error deleting user. Please try again.', 'error');
+    }
   }
 
-  renderAdminUsers() {
+  async renderAdminUsers() {
     const container = document.getElementById('admin-users-list');
     if (!container) return;
     
     container.innerHTML = '';
     
-    this.users.forEach(user => {
-      const userItem = document.createElement('div');
-      userItem.className = 'user-item';
+    try {
+      const users = await this.driveSync.getAllUsers();
       
-      const deleteButton = document.createElement('button');
-      deleteButton.className = 'delete-user-btn';
-      deleteButton.textContent = 'Delete';
-      deleteButton.disabled = user.username === this.currentUser.username;
-      deleteButton.addEventListener('click', () => this.deleteUser(user.username));
-      
-      userItem.innerHTML = `
-        <div class="user-details">
-          <div class="user-name">${user.username}</div>
-          <div class="user-meta">${user.role} • Last modified: ${new Date(user.lastModified).toLocaleString()}</div>
-        </div>
-      `;
-      
-      userItem.appendChild(deleteButton);
-      container.appendChild(userItem);
-    });
+      users.forEach(user => {
+        const userItem = document.createElement('div');
+        userItem.className = 'user-item';
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-user-btn';
+        deleteButton.textContent = 'Delete';
+        deleteButton.disabled = user.username === this.currentUser.username;
+        deleteButton.addEventListener('click', () => this.deleteUser(user.username));
+        
+        userItem.innerHTML = `
+          <div class="user-details">
+            <div class="user-name">${user.username}</div>
+            <div class="user-meta">${user.role} • Last modified: ${new Date(user.lastModified).toLocaleString()}</div>
+          </div>
+        `;
+        
+        userItem.appendChild(deleteButton);
+        container.appendChild(userItem);
+      });
+    } catch (error) {
+      console.error('Error rendering admin users:', error);
+      this.showNotification('Error loading users. Please try again.', 'error');
+    }
   }
 
-  // Utility Functions
   showNotification(message, type = 'info') {
     console.log(`Notification (${type}):`, message);
     
@@ -759,35 +756,6 @@ Please confirm this order!`;
   }
 }
 
-// Global Functions
-function showOrderModal(packageName, price) {
-  if (window.app) {
-    window.app.showOrderModal(packageName, price);
-  }
-}
-
-function showWeeklyPassOrder() {
-  const quantitySelect = document.getElementById('weekly-quantity');
-  const quantity = quantitySelect ? quantitySelect.value : '1';
-  const totalPrice = 130 * parseInt(quantity);
-  
-  if (window.app) {
-    window.app.showOrderModal(`Weekly Pass x${quantity}`, `₹ ${totalPrice.toLocaleString()}`);
-  }
-}
-
-function copyUpiId() {
-  navigator.clipboard.writeText(CONFIG.UPI_ID).then(() => {
-    if (window.app) {
-      window.app.showNotification('UPI ID copied to clipboard!', 'success');
-    }
-  }).catch(() => {
-    if (window.app) {
-      window.app.showNotification('Failed to copy UPI ID', 'error');
-    }
-  });
-}
-
 // Global app instance
 let app;
 
@@ -800,18 +768,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Make functions globally available
   window.app = app;
-  window.showOrderModal = showOrderModal;
-  window.showWeeklyPassOrder = showWeeklyPassOrder;
-  window.copyUpiId = copyUpiId;
+  window.showOrderModal = (packageName, price) => app.showOrderModal(packageName, price);
+  window.showWeeklyPassOrder = () => {
+    const quantitySelect = document.getElementById('weekly-quantity');
+    const quantity = quantitySelect ? quantitySelect.value : '1';
+    const totalPrice = 130 * parseInt(quantity);
+    app.showOrderModal(`Weekly Pass x${quantity}`, `₹ ${totalPrice.toLocaleString()}`);
+  };
+  window.copyUpiId = () => {
+    navigator.clipboard.writeText(CONFIG.UPI_ID).then(() => {
+      app.showNotification('UPI ID copied to clipboard!', 'success');
+    }).catch(() => {
+      app.showNotification('Failed to copy UPI ID', 'error');
+    });
+  };
   
   console.log('App ready!');
 });
-
-// Debug function to check users
-window.debugUsers = () => {
-  if (window.app) {
-    console.log('Current users:', window.app.users);
-    console.log('Current user:', window.app.currentUser);
-    console.log('Is logged in:', window.app.isLoggedIn);
-  }
-};
