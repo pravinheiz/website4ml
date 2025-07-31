@@ -71,6 +71,9 @@
 
     <!-- Main Store Content -->
     <main id="store-content" class="store-content hidden">
+      <!-- Mobile Menu Toggle -->
+      <button id="menu-toggle" class="btn btn--outline btn--sm mobile-menu-toggle">☰ Menu</button>
+      
       <!-- User Bar -->
       <div class="user-bar">
         <div class="user-info">
@@ -164,7 +167,7 @@
       </section>
     </main>
 
-    <!-- Enhanced Admin Panel with Sync Controls -->
+    <!-- Enhanced Admin Panel with Sync Controls and Order Management -->
     <div id="admin-panel" class="admin-panel hidden">
       <div class="admin-header">
         <h2>🛠️ Admin Panel</h2>
@@ -205,6 +208,20 @@
         </div>
         <div class="users-list" id="admin-users-list">
           <!-- Users will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Order Management Section -->
+      <div class="order-management-section">
+        <h3>📦 Order Management</h3>
+        <div class="order-filters">
+          <button class="filter-btn active" data-filter="all">All Orders</button>
+          <button class="filter-btn" data-filter="pending">Pending</button>
+          <button class="filter-btn" data-filter="processing">Processing</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+        <div class="orders-list" id="admin-orders-list">
+          <!-- Orders will be populated by JavaScript -->
         </div>
       </div>
     </div>
