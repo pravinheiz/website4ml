@@ -1,259 +1,276 @@
-/* Mobile Menu */
-.mobile-menu-toggle {
-  display: none;
-  margin-bottom: var(--space-16);
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P&K Store - MLBB Diamond Top-Up</title>
+  <link rel="icon" type="image/png" href="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png" alt="P&K Store Logo" class="logo">
+        <div class="store-info">
+          <h1>P&K Store</h1>
+          <p class="tagline">Premium MLBB Diamond Top-Up Service</p>
+        </div>
+      </div>
+      
+      <div class="sync-status-bar">
+        <div class="sync-indicator">
+          <span id="sync-status" class="sync-status disconnected">⚫ Local Only</span>
+          <button id="connect-drive-btn" class="btn btn--sm btn--outline">Connect Drive</button>
+        </div>
+      </div>
+    </header>
 
-/* Order Management Section */
-.order-management-section {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--space-20);
-  margin-top: var(--space-20);
-  border: 1px solid rgba(255, 70, 85, 0.3);
-}
+    <!-- Login Section -->
+    <section id="login-section" class="login-section">
+      <div class="login-card">
+        <h2>🎮 Login to P&K Store</h2>
+        <div class="security-badge">
+          <i class="fas fa-lock"></i>
+          <span>Secure Login</span>
+        </div>
+        <form id="login-form" class="login-form">
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
+          </div>
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+          <button id="test-login" class="btn btn--sm btn--outline" style="margin-top: 10px;">
+            Test Login (Admin)
+          </button>
+        </form>
+        <div class="login-footer">
+          <p>New customer? <a href="#" id="show-register">Create Account</a></p>
+          <p class="forgot-password"><a href="#" id="forgot-password">Forgot Password?</a></p>
+        </div>
+      </div>
+    </section>
 
-.order-filters {
-  display: flex;
-  gap: var(--space-8);
-  margin-bottom: var(--space-16);
-  flex-wrap: wrap;
-}
+    <!-- Registration Modal -->
+    <div id="register-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Account</h3>
+          <button class="close-btn" id="close-register">&times;</button>
+        </div>
+        <form id="register-form" class="modal-body">
+          <div class="form-group">
+            <label for="reg-username" class="form-label">Username</label>
+            <input type="text" id="reg-username" class="form-control" placeholder="Choose a username" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-password" class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-control" 
+                   placeholder="Create a password" required
+                   oninput="app.checkPasswordStrength(this.value)">
+            <div id="password-strength" class="password-strength">
+              <div class="password-strength-bar"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-confirm" class="form-label">Confirm Password</label>
+            <input type="password" id="reg-confirm" class="form-control" placeholder="Confirm your password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
+        </form>
+      </div>
+    </div>
 
-.filter-btn {
-  padding: var(--space-6) var(--space-12);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-sm);
-  background: var(--color-secondary);
-  border: 1px solid var(--color-border);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-standard);
-}
+    <!-- Main Store Content -->
+    <main id="store-content" class="store-content hidden">
+      <!-- User Info Bar -->
+      <div class="user-bar">
+        <div class="user-info">
+          <span class="user-welcome">Welcome, <span id="current-user">User</span>!</span>
+          <span class="user-role" id="user-role"></span>
+        </div>
+        <div class="user-actions">
+          <button id="admin-panel-btn" class="btn btn--secondary btn--sm hidden">Admin Panel</button>
+          <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
+        </div>
+      </div>
 
-.filter-btn.active {
-  background: var(--mlbb-red);
-  color: white;
-  border-color: var(--mlbb-red);
-}
+      <!-- Payment Info -->
+      <section class="payment-section">
+        <h2 class="section-title">💳 Payment Information</h2>
+        <div class="payment-info-card">
+          <div class="payment-qr">
+            <img src="https://i.ibb.co/Ng8QNzV9/Whats-App-Image-2025-07-02-at-09-13-44-998097fb.jpg" alt="Payment QR Code" class="qr-code">
+          </div>
+          <div class="payment-method">
+            <h3>UPI Payment</h3>
+            <div class="upi-info">
+              <span class="upi-id">BHARATPE.8R0E0I8U2N09755@fbpe</span>
+              <button class="btn btn--sm btn--outline" onclick="app.copyUpiId()">Copy UPI ID</button>
+            </div>
+          </div>
+          <div class="payment-method">
+            <h3>WhatsApp Support</h3>
+            <div class="whatsapp-info">
+              <span class="whatsapp-number">+91 9362584929</span>
+              <a href="https://wa.me/919362584929" target="_blank" class="btn btn--sm btn--primary">
+                Chat on WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-.filter-btn:hover {
-  background: var(--color-secondary-hover);
-}
+      <!-- Diamond Packages -->
+      <section class="packages-section">
+        <h2 class="section-title">💎 Diamond Packages</h2>
+        
+        <div class="package-category">
+          <h3 class="category-title">Small Packs</h3>
+          <div class="packages-grid" id="small-packs"></div>
+        </div>
 
-.orders-list {
-  max-height: 400px;
-  overflow-y: auto;
-  border-radius: var(--radius-base);
-}
+        <div class="package-category">
+          <h3 class="category-title">Medium Packs</h3>
+          <div class="packages-grid" id="medium-packs"></div>
+        </div>
 
-.order-item {
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-12);
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-sm);
-  margin-bottom: var(--space-8);
-  border-left: 3px solid var(--mlbb-red);
-}
+        <div class="package-category">
+          <h3 class="category-title">Premium Packs</h3>
+          <div class="packages-grid" id="larger-packs"></div>
+        </div>
+      </section>
+    </main>
 
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: var(--space-8);
-}
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel hidden">
+      <div class="admin-header">
+        <h2>🛠️ Admin Panel</h2>
+        <button id="close-admin" class="btn btn--outline btn--sm">Close</button>
+      </div>
+      <div class="admin-body">
+        <div class="admin-tabs">
+          <button class="tab-btn active" data-tab="users">Users</button>
+          <button class="tab-btn" data-tab="orders">Orders</button>
+          <button class="tab-btn" data-tab="settings">Settings</button>
+        </div>
+        
+        <div id="users-tab" class="tab-content active">
+          <div class="user-management-section">
+            <h3>👥 User Management</h3>
+            <div class="add-user-form">
+              <input type="text" id="admin-username" class="form-control" placeholder="Username">
+              <input type="password" id="admin-password" class="form-control" placeholder="Password">
+              <select id="admin-role" class="form-control">
+                <option value="customer">Customer</option>
+                <option value="vip">VIP</option>
+                <option value="admin">Admin</option>
+              </select>
+              <button id="add-user-btn" class="btn btn--primary">Add User</button>
+            </div>
+            <div class="users-list" id="admin-users-list"></div>
+          </div>
+        </div>
+        
+        <div id="orders-tab" class="tab-content">
+          <div class="order-management-section">
+            <h3>📦 Order Management</h3>
+            <div class="order-filters">
+              <button class="filter-btn active" data-filter="all">All Orders</button>
+              <button class="filter-btn" data-filter="pending">Pending</button>
+              <button class="filter-btn" data-filter="processing">Processing</button>
+              <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+            <div class="orders-list" id="admin-orders-list"></div>
+          </div>
+        </div>
+        
+        <div id="settings-tab" class="tab-content">
+          <div class="settings-section">
+            <h3>⚙️ Application Settings</h3>
+            <div class="sync-controls-section">
+              <h4>☁️ Google Drive Sync</h4>
+              <div class="sync-controls">
+                <div class="sync-actions">
+                  <button id="sync-to-drive" class="btn btn--primary btn--sm">Sync to Drive</button>
+                  <button id="load-from-drive" class="btn btn--secondary btn--sm">Load from Drive</button>
+                  <button id="force-sync" class="btn btn--outline btn--sm">Force Sync</button>
+                </div>
+                <div class="sync-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="admin-sync-progress"></div>
+                  </div>
+                  <span class="progress-text" id="admin-sync-text">Ready</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-.order-id {
-  font-weight: var(--font-weight-bold);
-  color: var(--mlbb-gold);
-}
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Complete Your Order</h3>
+          <button class="close-btn" id="close-order">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="order-summary">
+            <div class="order-item">
+              <span class="item-name" id="order-package">Package Name</span>
+              <span class="item-price" id="order-price">₹ 0</span>
+            </div>
+          </div>
+          
+          <form id="order-form">
+            <div class="form-group">
+              <label for="mlbb-id" class="form-label">MLBB ID</label>
+              <input type="text" id="mlbb-id" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="server-id" class="form-label">Server ID</label>
+              <input type="number" id="server-id" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="ign" class="form-label">IGN</label>
+              <input type="text" id="ign" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full-width">
+              📱 Send Order via WhatsApp
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
 
-.order-date {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+      <span id="notification-text"></span>
+    </div>
 
-.order-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Processing...</div>
+    </div>
 
-.order-info {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-8);
-}
+    <!-- Session Timeout Warning -->
+    <div id="session-warning" class="session-timeout-warning hidden">
+      <i class="fas fa-clock"></i>
+      <span>Your session will expire in <span id="session-countdown">5:00</span></span>
+      <button id="extend-session" class="btn btn--sm btn--outline">Stay Logged In</button>
+    </div>
+  </div>
 
-.order-username {
-  font-weight: var(--font-weight-medium);
-}
-
-.order-package {
-  color: var(--mlbb-gold);
-}
-
-.order-price {
-  font-weight: var(--font-weight-bold);
-}
-
-.order-server-id {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-
-.order-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: var(--space-8);
-}
-
-.order-status {
-  padding: var(--space-4) var(--space-8);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-}
-
-.status-pending {
-  background: rgba(255, 215, 0, 0.1);
-  color: var(--mlbb-gold);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-}
-
-.status-processing {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3B82F6;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.status-completed {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--mlbb-accent);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.status-buttons {
-  display: flex;
-  gap: var(--space-4);
-}
-
-.status-btn {
-  padding: var(--space-2) var(--space-8);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  cursor: pointer;
-  border: none;
-}
-
-.status-btn.status-pending {
-  background: var(--mlbb-gold);
-  color: var(--mlbb-dark);
-}
-
-.status-btn.status-processing {
-  background: #3B82F6;
-  color: white;
-}
-
-.status-btn.status-completed {
-  background: var(--mlbb-accent);
-  color: white;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .mobile-menu-toggle {
-    display: block;
-  }
-
-  .container {
-    padding: var(--space-12);
-  }
-
-  .logo-container {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .sync-indicator {
-    flex-direction: column;
-    gap: var(--space-8);
-  }
-
-  .user-bar {
-    flex-direction: column;
-    gap: var(--space-12);
-    text-align: center;
-  }
-
-  .packages-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .payment-info-card {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-
-  .upi-info, .whatsapp-info {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .add-user-form {
-    flex-direction: column;
-  }
-
-  .admin-panel {
-    padding: var(--space-12);
-  }
-
-  .modal-content {
-    width: 95%;
-    margin: var(--space-16);
-  }
-
-  .order-item {
-    flex-direction: column;
-  }
-
-  .order-actions {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-8);
-  }
-
-  .status-buttons {
-    width: 100%;
-    justify-content: space-between;
-  }
-}
-
-@media (max-width: 480px) {
-  .store-info h1 {
-    font-size: var(--font-size-3xl);
-  }
-
-  .section-title {
-    font-size: var(--font-size-2xl);
-  }
-
-  .category-title {
-    font-size: var(--font-size-xl);
-  }
-
-  .login-card {
-    padding: var(--space-24);
-  }
-
-  .modal-body {
-    padding: var(--space-16);
-  }
-
-  .order-info {
-    flex-direction: column;
-  }
-}
+  <script src="app.js"></script>
+</body>
+</html>
