@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P&K Store - MLBB Diamond Store</title>
+  <title>P&K Store - MLBB Diamond Top-Up</title>
+  <link rel="icon" type="image/png" href="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <script src="https://apis.google.com/js/api.js" defer></script>
+  <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
   <div class="container">
     <!-- Header -->
     <header class="header">
       <div class="logo-container">
-        <img src="https://i.ibb.co/HVBjSgL/logo.png" alt="P&K Store" class="logo">
+        <img src="https://i.ibb.co/TxRTR7gK/Screenshot-2025-07-02-093146.png" alt="P&K Store Logo" class="logo">
         <div class="store-info">
           <h1>P&K Store</h1>
-          <p class="tagline">Your trusted MLBB diamond store</p>
+          <p class="tagline">Premium MLBB Diamond Top-Up Service</p>
         </div>
       </div>
+      
       <div class="sync-status-bar">
         <div class="sync-indicator">
-          <span id="sync-status" class="sync-status sync-disconnected">⚫ Local Only</span>
-          <button id="connect-drive-btn" class="btn btn--outline btn--sm">Connect Drive</button>
+          <span id="sync-status" class="sync-status disconnected">⚫ Local Only</span>
+          <button id="connect-drive-btn" class="btn btn--sm btn--outline">Connect Drive</button>
         </div>
       </div>
     </header>
@@ -30,18 +33,28 @@
     <section id="login-section" class="login-section">
       <div class="login-card">
         <h2>🎮 Login to P&K Store</h2>
+        <div class="security-badge">
+          <i class="fas fa-lock"></i>
+          <span>Secure Login</span>
+        </div>
         <form id="login-form" class="login-form">
           <div class="form-group">
-            <input type="text" id="username" class="form-control" placeholder="Username" required>
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
           </div>
           <div class="form-group">
-            <input type="password" id="password" class="form-control" placeholder="Password" required>
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
           </div>
           <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+          <button id="test-login" class="btn btn--sm btn--outline" style="margin-top: 10px;">
+            Test Login (Admin)
+          </button>
         </form>
-        <p class="login-footer">
-          No account? <a href="#" id="show-register">Register here</a>
-        </p>
+        <div class="login-footer">
+          <p>New customer? <a href="#" id="show-register">Create Account</a></p>
+          <p class="forgot-password"><a href="#" id="forgot-password">Forgot Password?</a></p>
+        </div>
       </div>
     </section>
 
@@ -50,61 +63,64 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>Create New Account</h3>
-          <button id="close-register" class="close-btn">&times;</button>
+          <button class="close-btn" id="close-register">&times;</button>
         </div>
-        <div class="modal-body">
-          <form id="register-form">
-            <div class="form-group">
-              <input type="text" id="reg-username" class="form-control" placeholder="Username" required>
+        <form id="register-form" class="modal-body">
+          <div class="form-group">
+            <label for="reg-username" class="form-label">Username</label>
+            <input type="text" id="reg-username" class="form-control" placeholder="Choose a username" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-password" class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-control" 
+                   placeholder="Create a password" required
+                   oninput="app.checkPasswordStrength(this.value)">
+            <div id="password-strength" class="password-strength">
+              <div class="password-strength-bar"></div>
             </div>
-            <div class="form-group">
-              <input type="password" id="reg-password" class="form-control" placeholder="Password" required>
-            </div>
-            <div class="form-group">
-              <input type="password" id="reg-confirm" class="form-control" placeholder="Confirm Password" required>
-            </div>
-            <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
-          </form>
-        </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-confirm" class="form-label">Confirm Password</label>
+            <input type="password" id="reg-confirm" class="form-control" placeholder="Confirm your password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
+        </form>
       </div>
     </div>
 
     <!-- Main Store Content -->
     <main id="store-content" class="store-content hidden">
-      <!-- Mobile Menu Toggle -->
-      <button id="menu-toggle" class="btn btn--outline btn--sm mobile-menu-toggle">☰ Menu</button>
-      
-      <!-- User Bar -->
+      <!-- User Info Bar -->
       <div class="user-bar">
         <div class="user-info">
-          <span class="user-welcome">Welcome, <strong id="current-user"></strong>!</span>
-          <span class="user-role" id="user-role">CUSTOMER</span>
+          <span class="user-welcome">Welcome, <span id="current-user">User</span>!</span>
+          <span class="user-role" id="user-role"></span>
         </div>
         <div class="user-actions">
+          <button id="admin-panel-btn" class="btn btn--secondary btn--sm hidden">Admin Panel</button>
           <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
-          <button id="admin-panel-btn" class="btn btn--primary btn--sm hidden">Admin Panel</button>
         </div>
       </div>
 
-      <!-- Payment Information -->
+      <!-- Payment Info -->
       <section class="payment-section">
         <h2 class="section-title">💳 Payment Information</h2>
         <div class="payment-info-card">
           <div class="payment-qr">
-            <img src="https://i.ibb.co/HVBjSgL/qr-code.png" alt="Payment QR Code" class="qr-code">
+            <img src="https://i.ibb.co/Ng8QNzV9/Whats-App-Image-2025-07-02-at-09-13-44-998097fb.jpg" alt="Payment QR Code" class="qr-code">
           </div>
           <div class="payment-method">
-            <h3>🏦 UPI Payment</h3>
+            <h3>UPI Payment</h3>
             <div class="upi-info">
-              <span class="upi-id" id="upi-id">BHARATPE.8R0E0I8U2N09755@fbpe</span>
-              <button class="btn btn--outline btn--sm" onclick="copyUpiId()">Copy UPI ID</button>
+              <span class="upi-id">BHARATPE.8R0E0I8U2N09755@fbpe</span>
+              <button class="btn btn--sm btn--outline" onclick="app.copyUpiId()">Copy UPI ID</button>
             </div>
           </div>
           <div class="payment-method">
-            <h3>💬 WhatsApp Support</h3>
+            <h3>WhatsApp Support</h3>
             <div class="whatsapp-info">
               <span class="whatsapp-number">+91 9362584929</span>
-              <a href="https://wa.me/919362584929" target="_blank" class="btn btn--outline btn--sm" style="background: var(--whatsapp-green); color: white; border-color: var(--whatsapp-green);">
+              <a href="https://wa.me/919362584929" target="_blank" class="btn btn--sm btn--primary">
                 Chat on WhatsApp
               </a>
             </div>
@@ -116,112 +132,86 @@
       <section class="packages-section">
         <h2 class="section-title">💎 Diamond Packages</h2>
         
-        <!-- Small Packs -->
         <div class="package-category">
-          <h3 class="category-title">🔥 Small Packs</h3>
-          <div id="small-packs" class="packages-grid">
-            <!-- Small packages will be populated by JavaScript -->
-          </div>
+          <h3 class="category-title">Small Packs</h3>
+          <div class="packages-grid" id="small-packs"></div>
         </div>
 
-        <!-- Medium Packs -->
         <div class="package-category">
-          <h3 class="category-title">⚡ Medium Packs</h3>
-          <div id="medium-packs" class="packages-grid">
-            <!-- Medium packages will be populated by JavaScript -->
-          </div>
+          <h3 class="category-title">Medium Packs</h3>
+          <div class="packages-grid" id="medium-packs"></div>
         </div>
 
-        <!-- Larger Packs -->
         <div class="package-category">
-          <h3 class="category-title">🚀 Larger Packs</h3>
-          <div id="larger-packs" class="packages-grid">
-            <!-- Larger packages will be populated by JavaScript -->
-          </div>
-        </div>
-
-        <!-- Weekly Pass -->
-        <div class="package-category">
-          <h3 class="category-title">📅 Weekly Pass</h3>
-          <div class="packages-grid">
-            <div class="package-card special">
-              <div class="package-header">
-                <div class="diamond-count">Weekly Pass</div>
-                <div class="package-price">₹ 130</div>
-              </div>
-              <div class="package-bonus">
-                <span class="bonus-text">Daily rewards for 7 days</span>
-              </div>
-              <div class="quantity-controls">
-                <label for="weekly-quantity">Quantity:</label>
-                <select id="weekly-quantity" class="form-control">
-                  <option value="1">1 Week</option>
-                  <option value="2">2 Weeks</option>
-                  <option value="4">1 Month</option>
-                </select>
-              </div>
-              <button class="package-btn" type="button" onclick="showWeeklyPassOrder()">Buy Weekly Pass</button>
-            </div>
-          </div>
+          <h3 class="category-title">Premium Packs</h3>
+          <div class="packages-grid" id="larger-packs"></div>
         </div>
       </section>
     </main>
 
-    <!-- Enhanced Admin Panel with Sync Controls and Order Management -->
+    <!-- Admin Panel -->
     <div id="admin-panel" class="admin-panel hidden">
       <div class="admin-header">
         <h2>🛠️ Admin Panel</h2>
         <button id="close-admin" class="btn btn--outline btn--sm">Close</button>
       </div>
-
-      <!-- Sync Controls Section -->
-      <div class="sync-controls-section">
-        <h3>☁️ Google Drive Sync</h3>
-        <div class="sync-controls">
-          <div class="sync-actions">
-            <button id="sync-to-drive" class="btn btn--primary btn--sm">Sync to Drive</button>
-            <button id="load-from-drive" class="btn btn--secondary btn--sm">Load from Drive</button>
-            <button id="force-sync" class="btn btn--outline btn--sm">Force Sync</button>
-          </div>
-          <div class="sync-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" id="admin-sync-progress"></div>
+      <div class="admin-body">
+        <div class="admin-tabs">
+          <button class="tab-btn active" data-tab="users">Users</button>
+          <button class="tab-btn" data-tab="orders">Orders</button>
+          <button class="tab-btn" data-tab="settings">Settings</button>
+        </div>
+        
+        <div id="users-tab" class="tab-content active">
+          <div class="user-management-section">
+            <h3>👥 User Management</h3>
+            <div class="add-user-form">
+              <input type="text" id="admin-username" class="form-control" placeholder="Username">
+              <input type="password" id="admin-password" class="form-control" placeholder="Password">
+              <select id="admin-role" class="form-control">
+                <option value="customer">Customer</option>
+                <option value="vip">VIP</option>
+                <option value="admin">Admin</option>
+              </select>
+              <button id="add-user-btn" class="btn btn--primary">Add User</button>
             </div>
-            <span class="progress-text" id="admin-sync-text">Ready</span>
+            <div class="users-list" id="admin-users-list"></div>
           </div>
         </div>
-      </div>
-
-      <!-- User Management Section -->
-      <div class="user-management-section">
-        <h3>👥 User Management</h3>
-        <div class="add-user-form">
-          <input type="text" id="admin-username" class="form-control" placeholder="Username">
-          <input type="password" id="admin-password" class="form-control" placeholder="Password">
-          <select id="admin-role" class="form-control">
-            <option value="">Select Role</option>
-            <option value="admin">Admin</option>
-            <option value="customer">Customer</option>
-            <option value="vip">VIP</option>
-          </select>
-          <button id="add-user-btn" class="btn btn--primary">Add User</button>
+        
+        <div id="orders-tab" class="tab-content">
+          <div class="order-management-section">
+            <h3>📦 Order Management</h3>
+            <div class="order-filters">
+              <button class="filter-btn active" data-filter="all">All Orders</button>
+              <button class="filter-btn" data-filter="pending">Pending</button>
+              <button class="filter-btn" data-filter="processing">Processing</button>
+              <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+            <div class="orders-list" id="admin-orders-list"></div>
+          </div>
         </div>
-        <div class="users-list" id="admin-users-list">
-          <!-- Users will be populated by JavaScript -->
-        </div>
-      </div>
-
-      <!-- Order Management Section -->
-      <div class="order-management-section">
-        <h3>📦 Order Management</h3>
-        <div class="order-filters">
-          <button class="filter-btn active" data-filter="all">All Orders</button>
-          <button class="filter-btn" data-filter="pending">Pending</button>
-          <button class="filter-btn" data-filter="processing">Processing</button>
-          <button class="filter-btn" data-filter="completed">Completed</button>
-        </div>
-        <div class="orders-list" id="admin-orders-list">
-          <!-- Orders will be populated by JavaScript -->
+        
+        <div id="settings-tab" class="tab-content">
+          <div class="settings-section">
+            <h3>⚙️ Application Settings</h3>
+            <div class="sync-controls-section">
+              <h4>☁️ Google Drive Sync</h4>
+              <div class="sync-controls">
+                <div class="sync-actions">
+                  <button id="sync-to-drive" class="btn btn--primary btn--sm">Sync to Drive</button>
+                  <button id="load-from-drive" class="btn btn--secondary btn--sm">Load from Drive</button>
+                  <button id="force-sync" class="btn btn--outline btn--sm">Force Sync</button>
+                </div>
+                <div class="sync-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="admin-sync-progress"></div>
+                  </div>
+                  <span class="progress-text" id="admin-sync-text">Ready</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -230,37 +220,33 @@
     <div id="order-modal" class="modal hidden">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>💎 Order Details</h3>
-          <button id="close-order" class="close-btn">&times;</button>
+          <h3>Complete Your Order</h3>
+          <button class="close-btn" id="close-order">&times;</button>
         </div>
         <div class="modal-body">
           <div class="order-summary">
             <div class="order-item">
-              <span class="item-name" id="order-item-name">Package Name</span>
-              <span class="item-price" id="order-item-price">₹ 0</span>
+              <span class="item-name" id="order-package">Package Name</span>
+              <span class="item-price" id="order-price">₹ 0</span>
             </div>
           </div>
-
-          <div class="payment-instructions">
-            <h4>📋 Payment Instructions:</h4>
-            <ol>
-              <li>Copy the UPI ID or scan the QR code</li>
-              <li>Make payment through any UPI app</li>
-              <li>Take a screenshot of payment confirmation</li>
-              <li>Send the screenshot along with your server ID via WhatsApp</li>
-            </ol>
-          </div>
-
+          
           <form id="order-form">
             <div class="form-group">
-              <label for="server-id" class="form-label">Server ID (Numbers only):</label>
-              <input type="text" id="server-id" class="form-control" placeholder="Enter your server ID" required>
-              <div class="form-help">Enter your MLBB server ID (numbers only)</div>
+              <label for="mlbb-id" class="form-label">MLBB ID</label>
+              <input type="text" id="mlbb-id" class="form-control" required>
             </div>
-            
-            <div class="order-actions">
-              <button type="submit" class="btn btn--primary btn--full-width">Send Order via WhatsApp</button>
+            <div class="form-group">
+              <label for="server-id" class="form-label">Server ID</label>
+              <input type="number" id="server-id" class="form-control" required>
             </div>
+            <div class="form-group">
+              <label for="ign" class="form-label">IGN</label>
+              <input type="text" id="ign" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full-width">
+              📱 Send Order via WhatsApp
+            </button>
           </form>
         </div>
       </div>
@@ -269,6 +255,19 @@
     <!-- Notification -->
     <div id="notification" class="notification hidden">
       <span id="notification-text"></span>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Processing...</div>
+    </div>
+
+    <!-- Session Timeout Warning -->
+    <div id="session-warning" class="session-timeout-warning hidden">
+      <i class="fas fa-clock"></i>
+      <span>Your session will expire in <span id="session-countdown">5:00</span></span>
+      <button id="extend-session" class="btn btn--sm btn--outline">Stay Logged In</button>
     </div>
   </div>
 
