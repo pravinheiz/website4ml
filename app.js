@@ -1,9 +1,10 @@
-// Application Configuration
+// Enhanced Application Configuration
 const CONFIG = {
   GOOGLE_CLIENT_ID: '856647789843-teunsdqh8coqkicbq1rhgnesqpr5stkl.apps.googleusercontent.com',
   DISCOVERY_DOCS: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
   SCOPES: 'https://www.googleapis.com/auth/drive.file',
   USER_DATA_FILENAME: 'pk-store-users.json',
+  ORDER_HISTORY_FILENAME: 'pk-store-orders.json',
   WHATSAPP_NUMBER: '9362584929',
   UPI_ID: 'BHARATPE.8R0E0I8U2N09755@fbpe',
   ENCRYPTION_KEY: 'secure-encryption-key-123' // In production, use a more secure key
@@ -64,6 +65,9 @@ const DEFAULT_USERS = [
   { username: "vip_user", password: "vip789", role: "vip", lastModified: Date.now() }
 ];
 
+// Default Orders
+const DEFAULT_ORDERS = [];
+
 // Enhanced Google Drive Sync Class
 class DriveSync {
   constructor() {
@@ -71,7 +75,9 @@ class DriveSync {
     this.DISCOVERY_DOCS = CONFIG.DISCOVERY_DOCS;
     this.SCOPES = CONFIG.SCOPES;
     this.USER_DATA_FILENAME = CONFIG.USER_DATA_FILENAME;
-    this.fileId = null;
+    this.ORDER_HISTORY_FILENAME = CONFIG.ORDER_HISTORY_FILENAME;
+    this.userFileId = null;
+    this.orderFileId = null;
     this.isInitialized = false;
     this.isAuthenticated = false;
   }
@@ -153,7 +159,7 @@ class DriveSync {
     statusElement.className = `sync-status ${statusInfo.class}`;
   }
 
-  async syncToDrive(data) {
+  async syncToDrive(data, filename) {
     if (!this.isAuthenticated) {
       this.showNotification('Not connected to Google Drive', 'error');
       return false;
@@ -167,11 +173,12 @@ class DriveSync {
       
       const fileContent = encryptedData;
       const blob = new Blob([fileContent], { type: 'application/json' });
+      const fileId = filename === this.USER_DATA_FILENAME ? this.userFileId : this.orderFileId;
       
-      if (this.fileId) {
+      if (fileId) {
         // Update existing file
         const response = await gapi.client.drive.files.update({
-          fileId: this.fileId,
+          fileId: fileId,
           uploadType: 'media',
           media: {
             mimeType: 'application/json',
@@ -183,7 +190,7 @@ class DriveSync {
         // Create new file
         const response = await gapi.client.drive.files.create({
           resource: {
-            name: this.USER_DATA_FILENAME,
+            name: filename,
             mimeType: 'application/json',
             parents: ['root']
           },
@@ -193,7 +200,12 @@ class DriveSync {
           },
           fields: 'id'
         });
-        this.fileId = response.result.id;
+        
+        if (filename === this.USER_DATA_FILENAME) {
+          this.userFileId = response.result.id;
+        } else {
+          this.orderFileId = response.result.id;
+        }
         console.log('File created:', response);
       }
       
@@ -206,7 +218,7 @@ class DriveSync {
     }
   }
 
-  async loadFromDrive() {
+  async loadFromDrive(filename) {
     if (!this.isAuthenticated) {
       this.showNotification('Not connected to Google Drive', 'error');
       return null;
@@ -217,7 +229,7 @@ class DriveSync {
     try {
       // Search for the file
       const response = await gapi.client.drive.files.list({
-        q: `name='${this.USER_DATA_FILENAME}' and trashed=false`,
+        q: `name='${filename}' and trashed=false`,
         fields: 'files(id, name)'
       });
       
@@ -226,11 +238,16 @@ class DriveSync {
         return null;
       }
       
-      this.fileId = response.result.files[0].id;
+      const fileId = response.result.files[0].id;
+      if (filename === this.USER_DATA_FILENAME) {
+        this.userFileId = fileId;
+      } else {
+        this.orderFileId = fileId;
+      }
       
       // Get file content
       const fileResponse = await gapi.client.drive.files.get({
-        fileId: this.fileId,
+        fileId: fileId,
         alt: 'media'
       });
       
@@ -259,6 +276,7 @@ class PKStoreApp {
     this.driveSync = new DriveSync();
     this.currentUser = null;
     this.users = [];
+    this.orders = [];
     this.isLoggedIn = false;
     this.currentOrder = null;
   }
@@ -271,7 +289,7 @@ class PKStoreApp {
     
     if (driveInitialized) {
       // Try to load users from Drive first
-      const driveUsers = await this.driveSync.loadFromDrive();
+      const driveUsers = await this.driveSync.loadFromDrive(CONFIG.USER_DATA_FILENAME);
       if (driveUsers) {
         this.users = driveUsers;
         console.log('Loaded users from Google Drive:', this.users);
@@ -282,13 +300,30 @@ class PKStoreApp {
         
         // If we have local users but no Drive file, sync to Drive
         if (this.users.length > 0 && this.driveSync.isAuthenticated) {
-          await this.driveSync.syncToDrive(this.users);
+          await this.driveSync.syncToDrive(this.users, CONFIG.USER_DATA_FILENAME);
+        }
+      }
+
+      // Try to load orders from Drive
+      const driveOrders = await this.driveSync.loadFromDrive(CONFIG.ORDER_HISTORY_FILENAME);
+      if (driveOrders) {
+        this.orders = driveOrders;
+        console.log('Loaded orders from Google Drive:', this.orders);
+      } else {
+        // Fall back to local storage
+        this.loadLocalOrders();
+        console.log('Loaded orders from localStorage:', this.orders);
+        
+        // If we have local orders but no Drive file, sync to Drive
+        if (this.orders.length > 0 && this.driveSync.isAuthenticated) {
+          await this.driveSync.syncToDrive(this.orders, CONFIG.ORDER_HISTORY_FILENAME);
         }
       }
     } else {
       // Drive not available, use local storage
       this.loadLocalUsers();
-      console.log('Loaded users from localStorage:', this.users);
+      this.loadLocalOrders();
+      console.log('Loaded users and orders from localStorage');
     }
     
     // Setup event listeners
@@ -324,6 +359,24 @@ class PKStoreApp {
     }
   }
 
+  loadLocalOrders() {
+    try {
+      const stored = localStorage.getItem('pk-store-orders');
+      if (stored) {
+        this.orders = JSON.parse(stored);
+        console.log('Loaded orders from localStorage:', this.orders);
+      } else {
+        this.orders = [...DEFAULT_ORDERS];
+        this.saveLocalOrders();
+        console.log('Created default orders:', this.orders);
+      }
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      this.orders = [...DEFAULT_ORDERS];
+      this.saveLocalOrders();
+    }
+  }
+
   saveLocalUsers() {
     try {
       localStorage.setItem('pk-store-users', JSON.stringify(this.users));
@@ -333,13 +386,32 @@ class PKStoreApp {
     }
   }
 
+  saveLocalOrders() {
+    try {
+      localStorage.setItem('pk-store-orders', JSON.stringify(this.orders));
+      console.log('Saved orders to localStorage');
+    } catch (error) {
+      console.error('Error saving orders:', error);
+    }
+  }
+
   async saveUsers() {
     // Save to local storage
     this.saveLocalUsers();
     
     // Sync to Drive if authenticated
     if (this.driveSync.isAuthenticated) {
-      await this.driveSync.syncToDrive(this.users);
+      await this.driveSync.syncToDrive(this.users, CONFIG.USER_DATA_FILENAME);
+    }
+  }
+
+  async saveOrders() {
+    // Save to local storage
+    this.saveLocalOrders();
+    
+    // Sync to Drive if authenticated
+    if (this.driveSync.isAuthenticated) {
+      await this.driveSync.syncToDrive(this.orders, CONFIG.ORDER_HISTORY_FILENAME);
     }
   }
 
@@ -415,9 +487,10 @@ class PKStoreApp {
     if (syncToDriveBtn) {
       syncToDriveBtn.addEventListener('click', async () => {
         this.showNotification('Syncing to Google Drive...', 'info');
-        const success = await this.driveSync.syncToDrive(this.users);
-        if (success) {
-          this.showNotification('Users synced to Google Drive!', 'success');
+        const successUsers = await this.driveSync.syncToDrive(this.users, CONFIG.USER_DATA_FILENAME);
+        const successOrders = await this.driveSync.syncToDrive(this.orders, CONFIG.ORDER_HISTORY_FILENAME);
+        if (successUsers && successOrders) {
+          this.showNotification('Data synced to Google Drive!', 'success');
         }
       });
     }
@@ -426,13 +499,19 @@ class PKStoreApp {
     if (loadFromDriveBtn) {
       loadFromDriveBtn.addEventListener('click', async () => {
         this.showNotification('Loading from Google Drive...', 'info');
-        const driveUsers = await this.driveSync.loadFromDrive();
+        const driveUsers = await this.driveSync.loadFromDrive(CONFIG.USER_DATA_FILENAME);
+        const driveOrders = await this.driveSync.loadFromDrive(CONFIG.ORDER_HISTORY_FILENAME);
         if (driveUsers) {
           this.users = driveUsers;
           this.saveLocalUsers();
-          this.renderAdminUsers();
-          this.showNotification('Users loaded from Google Drive!', 'success');
         }
+        if (driveOrders) {
+          this.orders = driveOrders;
+          this.saveLocalOrders();
+        }
+        this.renderAdminUsers();
+        this.renderAdminOrders();
+        this.showNotification('Data loaded from Google Drive!', 'success');
       });
     }
     
@@ -440,12 +519,17 @@ class PKStoreApp {
     if (forceSyncBtn) {
       forceSyncBtn.addEventListener('click', async () => {
         this.showNotification('Forcing sync with Google Drive...', 'info');
-        await this.driveSync.syncToDrive(this.users);
-        const driveUsers = await this.driveSync.loadFromDrive();
-        if (driveUsers) {
+        await this.driveSync.syncToDrive(this.users, CONFIG.USER_DATA_FILENAME);
+        await this.driveSync.syncToDrive(this.orders, CONFIG.ORDER_HISTORY_FILENAME);
+        const driveUsers = await this.driveSync.loadFromDrive(CONFIG.USER_DATA_FILENAME);
+        const driveOrders = await this.driveSync.loadFromDrive(CONFIG.ORDER_HISTORY_FILENAME);
+        if (driveUsers && driveOrders) {
           this.users = driveUsers;
+          this.orders = driveOrders;
           this.saveLocalUsers();
+          this.saveLocalOrders();
           this.renderAdminUsers();
+          this.renderAdminOrders();
           this.showNotification('Force sync completed!', 'success');
         }
       });
@@ -461,7 +545,7 @@ class PKStoreApp {
     if (orderForm) {
       orderForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        this.sendWhatsAppOrder();
+        this.handleOrderSubmit();
       });
     }
     
@@ -484,6 +568,17 @@ class PKStoreApp {
         e.target.classList.add('hidden');
       }
     });
+    
+    // Responsive menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu) {
+          mobileMenu.classList.toggle('hidden');
+        }
+      });
+    }
     
     console.log('Event listeners setup completed');
   }
@@ -661,7 +756,8 @@ class PKStoreApp {
         this.showNotification('Connected to Google Drive!', 'success');
         
         // After connecting, sync local data to Drive
-        await this.driveSync.syncToDrive(this.users);
+        await this.driveSync.syncToDrive(this.users, CONFIG.USER_DATA_FILENAME);
+        await this.driveSync.syncToDrive(this.orders, CONFIG.ORDER_HISTORY_FILENAME);
       } else {
         this.showNotification('Failed to connect to Google Drive', 'error');
       }
@@ -717,6 +813,11 @@ class PKStoreApp {
   }
 
   showOrderModal(packageName, price) {
+    if (!this.isLoggedIn) {
+      this.showNotification('Please login to place an order', 'error');
+      return;
+    }
+    
     this.currentOrder = { packageName, price };
     
     const modal = document.getElementById('order-modal');
@@ -738,8 +839,8 @@ class PKStoreApp {
     this.currentOrder = null;
   }
 
-  sendWhatsAppOrder() {
-    if (!this.currentOrder) return;
+  async handleOrderSubmit() {
+    if (!this.currentOrder || !this.currentUser) return;
     
     const serverIdField = document.getElementById('server-id');
     const serverId = serverIdField ? serverIdField.value.trim() : '';
@@ -749,13 +850,44 @@ class PKStoreApp {
       return;
     }
     
-    const message = `Hi! I would like to order:\n${this.currentOrder.packageName}\nPrice: ${this.currentOrder.price}\nServer ID: ${serverId}\nUsername: ${this.currentUser.username}`;
+    // Create order object
+    const newOrder = {
+      id: Date.now().toString(),
+      username: this.currentUser.username,
+      package: this.currentOrder.packageName,
+      price: this.currentOrder.price,
+      serverId,
+      date: new Date().toISOString(),
+      status: 'pending'
+    };
+    
+    // Add to orders array
+    this.orders.push(newOrder);
+    
+    // Save orders
+    await this.saveOrders();
+    
+    // Send WhatsApp message
+    this.sendWhatsAppOrder(newOrder);
+    
+    // Close modal
+    this.closeOrderModal();
+    
+    // Show success message
+    this.showNotification('Order placed successfully!', 'success');
+    
+    // If admin, refresh orders list
+    if (this.currentUser.role === 'admin') {
+      this.renderAdminOrders();
+    }
+  }
+
+  sendWhatsAppOrder(order) {
+    const message = `Hi! I would like to order:\n${order.package}\nPrice: ${order.price}\nServer ID: ${order.serverId}\nUsername: ${order.username}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodedMessage}`;
     
     window.open(whatsappUrl, '_blank');
-    this.closeOrderModal();
-    this.showNotification('Opening WhatsApp...', 'success');
   }
 
   async handleAddUser() {
@@ -813,6 +945,17 @@ class PKStoreApp {
     this.showNotification(`User "${username}" deleted`, 'info');
   }
 
+  async updateOrderStatus(orderId, status) {
+    const order = this.orders.find(o => o.id === orderId);
+    if (order) {
+      order.status = status;
+      order.updatedAt = new Date().toISOString();
+      await this.saveOrders();
+      this.renderAdminOrders();
+      this.showNotification(`Order ${orderId} status updated to ${status}`, 'success');
+    }
+  }
+
   renderAdminUsers() {
     const list = document.getElementById('admin-users-list');
     if (!list) return;
@@ -839,13 +982,72 @@ class PKStoreApp {
     });
   }
 
+  renderAdminOrders() {
+    const list = document.getElementById('admin-orders-list');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    // Sort orders by date (newest first)
+    const sortedOrders = [...this.orders].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    sortedOrders.forEach(order => {
+      const orderItem = document.createElement('div');
+      orderItem.className = 'order-item';
+      
+      const statusClass = `status-${order.status.toLowerCase()}`;
+      
+      orderItem.innerHTML = `
+        <div class="order-details">
+          <div class="order-header">
+            <span class="order-id">#${order.id.slice(-6)}</span>
+            <span class="order-date">${new Date(order.date).toLocaleString()}</span>
+          </div>
+          <div class="order-body">
+            <div class="order-info">
+              <span class="order-username">${order.username}</span>
+              <span class="order-package">${order.package}</span>
+              <span class="order-price">${order.price}</span>
+            </div>
+            <div class="order-server-id">Server ID: ${order.serverId}</div>
+          </div>
+        </div>
+        <div class="order-actions">
+          <span class="order-status ${statusClass}">${order.status}</span>
+          <div class="status-buttons">
+            <button class="status-btn status-pending" data-status="pending">Pending</button>
+            <button class="status-btn status-processing" data-status="processing">Processing</button>
+            <button class="status-btn status-completed" data-status="completed">Completed</button>
+          </div>
+        </div>
+      `;
+      
+      // Add event listeners to status buttons
+      const statusButtons = orderItem.querySelectorAll('.status-btn');
+      statusButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          this.updateOrderStatus(order.id, button.dataset.status);
+        });
+      });
+      
+      list.appendChild(orderItem);
+    });
+  }
+
   showAdminPanel() {
-    document.getElementById('admin-panel').classList.remove('hidden');
-    this.renderAdminUsers();
+    const adminPanel = document.getElementById('admin-panel');
+    if (adminPanel) {
+      adminPanel.classList.remove('hidden');
+      this.renderAdminUsers();
+      this.renderAdminOrders();
+    }
   }
 
   hideAdminPanel() {
-    document.getElementById('admin-panel').classList.add('hidden');
+    const adminPanel = document.getElementById('admin-panel');
+    if (adminPanel) {
+      adminPanel.classList.add('hidden');
+    }
   }
 
   showNotification(message, type = 'info') {
@@ -909,5 +1111,6 @@ window.debugUsers = () => {
     console.log('Current users:', window.app.users);
     console.log('Current user:', window.app.currentUser);
     console.log('Is logged in:', window.app.isLoggedIn);
+    console.log('Orders:', window.app.orders);
   }
 };
